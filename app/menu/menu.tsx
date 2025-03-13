@@ -23,7 +23,15 @@ const testItems: Item[] = [
 
 export default function Menu() {
 	return (
-		<main className="h-screen w-screen overflow-y-auto">
+		<main className="no-scroll h-screen w-screen overflow-y-auto">
+			<div className="fixed h-1/2 w-full">
+				<img
+					src="https://images.pexels.com/photos/13735828/pexels-photo-13735828.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+					alt="restaurant"
+					className="h-full w-full object-cover"
+				/>
+			</div>
+
 			<div className="flex h-full flex-col justify-end">
 				{/* Menu */}
 				<div className="flex max-h-4/5 flex-col md:max-h-3/4 lg:max-h-2/3">
@@ -38,7 +46,7 @@ export default function Menu() {
 							</h1>
 						</div>
 					</div>
-					<div className="flex flex-col items-center gap-10 rounded-tl-2xl bg-primary p-[20px] sm:p-[30px] md:p-[50px] lg:p-[60px]">
+					<div className="z-50 flex flex-col items-center gap-10 rounded-tl-2xl bg-primary p-[20px] sm:p-[30px] md:p-[50px] lg:p-[60px]">
 						<MenuItem item={testItems[0]} />
 						<MenuItem item={testItems[1]} />
 						<MenuItem item={testItems[0]} />
@@ -79,6 +87,7 @@ function MenuItem({ item }: { item: Item }) {
 				<div className="flex h-[130px] w-1/3 items-center justify-center overflow-hidden rounded-xl object-cover">
 					{item.img && (
 						<img
+							className="h-full w-full object-cover"
 							src={item.img}
 							alt={item.name}
 						/>
