@@ -1,4 +1,5 @@
 import "./menu.css";
+import { Fragment, type HTMLProps, useEffect } from "react";
 
 interface Item {
 	name: string;
@@ -19,22 +20,72 @@ const testItems: Item[] = [
 		description:
 			"Equal parts craft-brewed espresso and fresh cow’s milk. A gentle, fruity flavor with a creamy mouthfeel.",
 	},
+	{
+		name: "Matcha Latte",
+		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
+		description:
+			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
+	},
+	{
+		name: "Gibraltar",
+		img: "https://i.pinimg.com/736x/39/7f/80/397f8000561719de89e66f18a02f81d0.jpg",
+		description:
+			"Equal parts craft-brewed espresso and fresh cow’s milk. A gentle, fruity flavor with a creamy mouthfeel.",
+	},
 ];
 
 export default function Menu() {
+	useEffect(() => {
+		const handleScroll = () => {
+			const main = document.getElementById("order-page-main");
+			const menuRect = document
+				.getElementById("menu-container")
+				?.getBoundingClientRect();
+
+			if (!main || !menuRect) return;
+
+			const scrollScale = Math.min(
+				main.scrollTop / (menuRect.top + main.scrollTop),
+				1,
+			);
+
+			const img = document.getElementById("order-page-img");
+			if (img) {
+				img.style.filter = `blur(${scrollScale * 20}px)`;
+				img.style.scale = `${scrollScale / 10 + 1}`;
+				img.style.opacity = `${(1 - scrollScale) * 100}%`;
+			}
+		};
+
+		const main = document.getElementById("order-page-main");
+
+		main?.addEventListener("scroll", handleScroll);
+
+		return () => {
+			main?.removeEventListener("scroll", handleScroll);
+		};
+	}, []);
+
 	return (
-		<main className="no-scroll h-screen w-screen overflow-y-auto">
-			<div className="fixed h-1/2 w-full">
+		<main
+			id="order-page-main"
+			className="no-scroll h-screen w-screen overflow-y-auto"
+		>
+			<div className="fixed h-1/3 w-full lg:h-1/2">
 				<img
-					src="https://images.pexels.com/photos/13735828/pexels-photo-13735828.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+					id="order-page-img"
+					src="public/test-menu-img.jpg"
 					alt="restaurant"
 					className="h-full w-full object-cover"
 				/>
 			</div>
 
-			<div className="flex h-full flex-col justify-end">
+			<div className="flex h-full flex-col justify-end pr-[15px] pl-[15px]">
 				{/* Menu */}
-				<div className="flex max-h-4/5 flex-col md:max-h-3/4 lg:max-h-2/3">
+				<div
+					id="menu-container"
+					className="relative flex max-h-4/5 animate-beckon flex-col md:max-h-3/4 lg:max-h-2/3"
+				>
 					<div className="flex flex-row items-end justify-end">
 						{/*<div className="relative bg-accent w-1/2 h-[85px] rounded-tl-2xl rounded-tr-2xl">*/}
 						{/*    <div className="absolute bottom-0 right-0 tl-corner w-[30px] h-[30px] bg-primary"></div>*/}
@@ -46,13 +97,14 @@ export default function Menu() {
 							</h1>
 						</div>
 					</div>
-					<div className="z-50 flex flex-col items-center gap-10 rounded-tl-2xl bg-primary p-[20px] sm:p-[30px] md:p-[50px] lg:p-[60px]">
-						<MenuItem item={testItems[0]} />
-						<MenuItem item={testItems[1]} />
-						<MenuItem item={testItems[0]} />
-						<MenuItem item={testItems[1]} />
-						<MenuItem item={testItems[0]} />
-						<MenuItem item={testItems[1]} />
+					<div className="z-50 rounded-tl-2xl rounded-br-2xl rounded-bl-2xl bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]">
+						<ul className="flex flex-col items-center gap-10">
+							{testItems.map((item, i) => (
+								<Fragment key={i}>
+									<MenuItem item={item} />
+								</Fragment>
+							))}
+						</ul>
 					</div>
 				</div>
 			</div>
@@ -60,9 +112,16 @@ export default function Menu() {
 	);
 }
 
-function MenuItem({ item }: { item: Item }) {
+interface MenuItemProps extends HTMLProps<HTMLDivElement> {
+	item: Item;
+}
+
+function MenuItem(props: MenuItemProps) {
 	return (
-		<div className="relative flex w-full justify-center">
+		<div
+			className="relative flex w-full justify-center"
+			{...props}
+		>
 			{/* shape */}
 			<div className="absolute flex w-full flex-row">
 				{/* shape - body */}
@@ -78,18 +137,20 @@ function MenuItem({ item }: { item: Item }) {
 				{/* Body */}
 				<div className="flex h-full w-2/3 flex-col">
 					<h2 className="font-dongle text-3xl sm:text-4xl lg:text-5xl">
-						{item.name}
+						{props.item.name}
 					</h2>
-					<p className="opacity-60 sm:text-lg lg:text-xl">{item.description}</p>
+					<p className="opacity-60 sm:text-lg lg:text-xl">
+						{props.item.description}
+					</p>
 				</div>
 
 				{/* Img */}
 				<div className="flex h-[130px] w-1/3 items-center justify-center overflow-hidden rounded-xl object-cover">
-					{item.img && (
+					{props.item.img && (
 						<img
 							className="h-full w-full object-cover"
-							src={item.img}
-							alt={item.name}
+							src={props.item.img}
+							alt={props.item.name}
 						/>
 					)}
 				</div>

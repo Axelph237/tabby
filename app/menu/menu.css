@@ -8,3 +8,7 @@
 .no-scroll::-webkit-scrollbar {
 	display: none; /* For Chrome, Safari, and Opera */
 }
+
+#order-page-img {
+	mask-image: linear-gradient(black 40%, transparent);
+}
