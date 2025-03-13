@@ -33,6 +33,6 @@
     "vite-tsconfig-paths": "^5.1.4"
   },
   "lint-staged": {
-    "*.{js,css,md}": "prettier --write"
+    "*.{js,css,md,ts,jsx,tsx}": "prettier --write"
   }
 }
