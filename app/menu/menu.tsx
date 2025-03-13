@@ -24,25 +24,28 @@ const testItems: Item[] = [
 export default function Menu() {
 	return (
 		<main className="h-screen w-screen overflow-y-auto">
-			<div className="flex flex-col">
-				<div className="flex flex-row items-end justify-end">
-					{/*<div className="relative bg-accent w-1/2 h-[85px] rounded-tl-2xl rounded-tr-2xl">*/}
-					{/*    <div className="absolute bottom-0 right-0 tl-corner w-[30px] h-[30px] bg-primary"></div>*/}
-					{/*</div>*/}
-					<div className="tl-corner h-[16px] w-[16px] bg-primary"></div>
-					<div className="relative right-0 h-[85px] w-1/2 rounded-tl-2xl rounded-tr-2xl bg-primary">
-						<h1 className="flex items-center justify-center font-dongle text-[64px] font-semibold text-accent">
-							Menu
-						</h1>
+			<div className="flex h-full flex-col justify-end">
+				{/* Menu */}
+				<div className="flex max-h-4/5 flex-col md:max-h-3/4 lg:max-h-2/3">
+					<div className="flex flex-row items-end justify-end">
+						{/*<div className="relative bg-accent w-1/2 h-[85px] rounded-tl-2xl rounded-tr-2xl">*/}
+						{/*    <div className="absolute bottom-0 right-0 tl-corner w-[30px] h-[30px] bg-primary"></div>*/}
+						{/*</div>*/}
+						<div className="tl-corner h-[16px] w-[16px] bg-primary"></div>
+						<div className="relative right-0 h-[85px] w-1/2 rounded-tl-2xl rounded-tr-2xl bg-primary">
+							<h1 className="flex items-center justify-center font-dongle text-[64px] font-semibold text-accent">
+								Menu
+							</h1>
+						</div>
 					</div>
-				</div>
-				<div className="flex flex-col items-center gap-10 rounded-tl-2xl bg-primary p-[20px] sm:p-[30px] md:p-[50px] lg:p-[60px]">
-					<MenuItem item={testItems[0]} />
-					<MenuItem item={testItems[1]} />
-					<MenuItem item={testItems[0]} />
-					<MenuItem item={testItems[1]} />
-					<MenuItem item={testItems[0]} />
-					<MenuItem item={testItems[1]} />
+					<div className="flex flex-col items-center gap-10 rounded-tl-2xl bg-primary p-[20px] sm:p-[30px] md:p-[50px] lg:p-[60px]">
+						<MenuItem item={testItems[0]} />
+						<MenuItem item={testItems[1]} />
+						<MenuItem item={testItems[0]} />
+						<MenuItem item={testItems[1]} />
+						<MenuItem item={testItems[0]} />
+						<MenuItem item={testItems[1]} />
+					</div>
 				</div>
 			</div>
 		</main>
