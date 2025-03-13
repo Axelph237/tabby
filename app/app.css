@@ -1,47 +1,47 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans:
-    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	--font-sans:
+		"Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+		"Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
-  --color-primary: #eeebd8;
-  --color-secondary: #45734c;
-  --color-accent: #353938;
+	--color-primary: #eeebd8;
+	--color-secondary: #45734c;
+	--color-accent: #353938;
 
-  --font-dongle: "Dongle", "sans-serif";
-  --font-redacted-script: "Redacted Script", "cursive";
-  --font-red-hat-text: "Red Hat Text", "sans-serif";
-  --font-red-hat-display: "Red Hat Display", "sans-serif";
-  --font-red-hat-mono: "Red Hat Mono", "sans-serif";
+	--font-dongle: "Dongle", "sans-serif";
+	--font-redacted-script: "Redacted Script", "cursive";
+	--font-red-hat-text: "Red Hat Text", "sans-serif";
+	--font-red-hat-display: "Red Hat Display", "sans-serif";
+	--font-red-hat-mono: "Red Hat Mono", "sans-serif";
 }
 
 html,
 body {
-  @apply bg-secondary font-red-hat-text text-primary;
+	@apply bg-secondary font-red-hat-text text-primary;
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+	@media (prefers-color-scheme: dark) {
+		color-scheme: dark;
+	}
 }
 
 /* Rounded corners (16px only) */
 .br-corner {
-  mask-image: url("public/br-corner16.svg");
-  mask-position: 0 0;
+	mask-image: url("public/br-corner16.svg");
+	mask-position: 0 0;
 }
 
 .bl-corner {
-  mask-image: url("public/bl-corner16.svg");
-  mask-size: 100%;
+	mask-image: url("public/bl-corner16.svg");
+	mask-size: 100%;
 }
 
 .tl-corner {
-  mask-image: url("public/tl-corner16.svg");
-  mask-size: 100%;
+	mask-image: url("public/tl-corner16.svg");
+	mask-size: 100%;
 }
 
 .tr-corner {
-  mask-image: url("public/tr-corner16.svg");
-  mask-size: 100%;
+	mask-image: url("public/tr-corner16.svg");
+	mask-size: 100%;
 }
