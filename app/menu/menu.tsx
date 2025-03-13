@@ -62,7 +62,7 @@ function MenuItem({ item }: { item: Item }) {
           <div className="bg-secondary br-corner h-[16px] w-[16px]"></div>
         </div>
       </div>
-            {/* Added comment */}
+             {/* Added comment */}
       {/* Sections */}
       <div className="relative flex h-[200px] w-full flex-row gap-[10px] p-[10px]">
         {/* Body */}
