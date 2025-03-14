@@ -61,20 +61,20 @@ export default function CheckoutReceipt({
 	};
 
 	return (
-		<main className="overflow-y-auto">
+		<main className="h-screen overflow-y-auto">
+			{/* header */}
+			<div
+				id="checkout-header"
+				className="sticky top-0 z-10 flex w-full flex-row items-center justify-between bg-primary px-6 text-accent"
+			>
+				<h1 className="font-dongle text-[64px]">Tabby</h1>
+				<TabbyLogo className="h-26 w-26" />
+			</div>
+
 			<div
 				id="checkout-container"
-				className="relative flex h-full min-h-screen flex-col items-center justify-start gap-[25px] bg-primary p-[20px] text-accent"
+				className="relative flex h-fit min-h-screen flex-col items-center justify-start gap-[25px] bg-primary p-[20px] text-accent"
 			>
-				{/* header */}
-				<div
-					id="checkout-header"
-					className="flex w-full flex-row justify-between"
-				>
-					<h1 className="font-dongle text-[64px]">Tabby</h1>
-					<TabbyLogo className="h-26 w-26" />
-				</div>
-
 				{/* body */}
 				<div
 					id="checkout-body"

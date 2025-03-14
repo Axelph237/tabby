@@ -20,7 +20,5 @@ export const tItemTypes: ItemType[] = [matcha, gibraltar];
 const NUM_ITEMS = 6;
 export const tItems: Item[] = [];
 for (let i = 0; i < NUM_ITEMS; i++) {
-	const rndIndex = Math.floor(Math.random() * tItemTypes.length);
-
-	tItems.push(tItemTypes[rndIndex].createItem([]));
+	tItems.push(tItemTypes[i % tItemTypes.length].createItem([]));
 }
