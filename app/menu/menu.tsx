@@ -2,29 +2,7 @@ import "./menu.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
 import ItemType from "~/lib/item";
-
-const matcha = new ItemType(
-	"",
-	"Matcha Latte",
-	"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
-	0,
-	"https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
-);
-const gibraltar = new ItemType(
-	"",
-	"Gibraltar",
-	"Equal parts craft-brewed espresso and fresh cow’s milk. A gentle, fruity flavor with a creamy mouthfeel.",
-	0,
-	"https://i.pinimg.com/736x/39/7f/80/397f8000561719de89e66f18a02f81d0.jpg",
-);
-
-export const testItems: ItemType[] = [
-	matcha,
-	gibraltar,
-	matcha,
-	matcha,
-	gibraltar,
-];
+import { tItemTypes } from "~/lib/testTypes";
 
 export default function Menu() {
 	const [itemCount, setItemCount] = useState(0);
@@ -137,7 +115,7 @@ export default function Menu() {
 					</div>
 					<div className="z-50 bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]">
 						<ul className="flex flex-col items-center gap-10">
-							{testItems.map((item, i) => (
+							{tItemTypes.map((item, i) => (
 								<Fragment key={i}>
 									<MenuItem
 										item={item}
