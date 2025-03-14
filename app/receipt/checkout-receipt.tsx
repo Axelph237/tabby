@@ -12,7 +12,7 @@ export default function CheckoutReceipt({
 	const [name, setName] = useState("");
 	const inputRef = useRef(null);
 
-	const getMaxCharacters = (pElement, sampleText = "W") => {
+	const getMaxCharacters = (pElem: HTMLElement, sampleText = "W") => {
 		let testSpan = document.createElement("span");
 		testSpan.style.visibility = "hidden"; // Hide it
 		testSpan.style.fontFamily = "Red Hat Mono";
@@ -21,7 +21,7 @@ export default function CheckoutReceipt({
 		document.body.appendChild(testSpan);
 
 		let charWidth = testSpan.offsetWidth; // Get width of one character
-		let maxChars = Math.floor(pElement.clientWidth / charWidth);
+		let maxChars = Math.floor(pElem.clientWidth / charWidth);
 
 		document.body.removeChild(testSpan); // Cleanup
 		return maxChars;
@@ -29,12 +29,15 @@ export default function CheckoutReceipt({
 
 	useEffect(() => {
 		const updateDashes = () => {
-			let pt = document.getElementById("dashes-t");
-			let pb = document.getElementById("dashes-b");
-			let maxChars = getMaxCharacters(pt, "-");
+			const pt = document.getElementById("dashes-t");
+			const pb = document.getElementById("dashes-b");
 
-			pt!.innerText = "-".repeat(maxChars);
-			pb!.innerText = "-".repeat(maxChars);
+			if (pt && pb) {
+				const maxChars = getMaxCharacters(pt, "-");
+
+				pt!.innerText = "-".repeat(maxChars);
+				pb!.innerText = "-".repeat(maxChars);
+			}
 		};
 
 		updateDashes();
