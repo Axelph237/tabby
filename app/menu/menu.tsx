@@ -3,6 +3,7 @@ import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
 import ItemType from "~/lib/item";
 import { tItemTypes } from "~/lib/testTypes";
+import { Link } from "react-router";
 
 export default function Menu() {
 	const [itemCount, setItemCount] = useState(0);
@@ -86,7 +87,8 @@ export default function Menu() {
 				/>
 			</div>
 
-			<div
+			<Link
+				to="/checkout"
 				id="checkout-btn-container"
 				className="gooey fixed bottom-10 left-10 z-[9999]"
 			>
@@ -98,7 +100,7 @@ export default function Menu() {
 					<span className="hidden md:block">Checkout</span>
 					<span className={`${itemCount <= 0 && "hidden"}`}>({itemCount})</span>
 				</button>
-			</div>
+			</Link>
 
 			<div className="flex h-full flex-col justify-end px-[15px]">
 				{/* Menu */}
