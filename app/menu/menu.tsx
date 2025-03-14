@@ -1,63 +1,29 @@
 import "./menu.css";
-import {
-	type ChangeEvent,
-	Fragment,
-	type HTMLProps,
-	useEffect,
-	useRef,
-	useState,
-} from "react";
+import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
+import ItemType from "~/lib/item";
 
-export interface Item {
-	name: string;
-	img?: string;
-	description?: string;
-}
+const matcha = new ItemType(
+	"",
+	"Matcha Latte",
+	"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
+	0,
+	"https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
+);
+const gibraltar = new ItemType(
+	"",
+	"Gibraltar",
+	"Equal parts craft-brewed espresso and fresh cow’s milk. A gentle, fruity flavor with a creamy mouthfeel.",
+	0,
+	"https://i.pinimg.com/736x/39/7f/80/397f8000561719de89e66f18a02f81d0.jpg",
+);
 
-export const testItems: Item[] = [
-	{
-		name: "Matcha Latte",
-		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
-		description:
-			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
-	},
-	{
-		name: "Gibraltar",
-		img: "https://i.pinimg.com/736x/39/7f/80/397f8000561719de89e66f18a02f81d0.jpg",
-		description:
-			"Equal parts craft-brewed espresso and fresh cow’s milk. A gentle, fruity flavor with a creamy mouthfeel.",
-	},
-	{
-		name: "Matcha Latte",
-		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
-		description:
-			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
-	},
-	{
-		name: "Matcha Latte",
-		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
-		description:
-			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
-	},
-	{
-		name: "Matcha Latte",
-		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
-		description:
-			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
-	},
-	{
-		name: "Matcha Latte",
-		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
-		description:
-			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
-	},
-	{
-		name: "Matcha Latte",
-		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
-		description:
-			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
-	},
+export const testItems: ItemType[] = [
+	matcha,
+	gibraltar,
+	matcha,
+	matcha,
+	gibraltar,
 ];
 
 export default function Menu() {
@@ -94,7 +60,7 @@ export default function Menu() {
 		};
 	}, []);
 
-	const handleUpdate = (item: Item, count: number) => {
+	const handleUpdate = (item: ItemType, count: number) => {
 		console.log("Adding items");
 
 		const parent = document.getElementById("checkout-btn-container");
@@ -188,8 +154,8 @@ export default function Menu() {
 }
 
 interface MenuItemProps extends HTMLProps<HTMLDivElement> {
-	item: Item;
-	onUpdate: (item: Item, count: number) => void;
+	item: ItemType;
+	onUpdate: (item: ItemType, count: number) => void;
 }
 
 function MenuItem(props: MenuItemProps) {
@@ -240,10 +206,10 @@ function MenuItem(props: MenuItemProps) {
 
 				{/* Img */}
 				<div className="flex h-[130px] w-1/3 items-center justify-center overflow-hidden rounded-xl object-cover">
-					{props.item.img && (
+					{props.item.imgUrl && (
 						<img
 							className="h-full w-full object-cover"
-							src={props.item.img}
+							src={props.item.imgUrl}
 							alt={props.item.name}
 						/>
 					)}

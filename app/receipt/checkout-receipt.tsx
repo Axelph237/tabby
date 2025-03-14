@@ -1,6 +1,6 @@
 import { TabbyLogo } from "~/components/icons";
 import { type ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
-import { type Item } from "~/menu/menu";
+import type { Item } from "~/lib/item";
 
 export default function CheckoutReceipt({
 	items,
@@ -146,7 +146,7 @@ function CheckoutItem({ item, count }: { item: Item; count: number }) {
 	return (
 		<div className="layered h-[64px] w-full items-center justify-center overflow-hidden rounded-2xl bg-secondary">
 			<img
-				src={item.img}
+				src={item.imgUrl}
 				alt={item.name}
 				className="top-0 left-0 aspect-auto w-[120%] object-cover opacity-35 blur-lg"
 			/>
