@@ -61,7 +61,7 @@
 		}
 	}
 
-	--animate-slideIn-l: slideIn-l 300ms ease-out forwards;
+	--animate-slideIn-l: slideIn-l 200ms ease-out forwards;
 	@keyframes slideIn-l {
 		from {
 			scale: 0.5;
@@ -73,7 +73,7 @@
 		}
 	}
 
-	--animate-slideIn-r: slideIn-r 300ms ease-out forwards;
+	--animate-slideIn-r: slideIn-r 200ms ease-out forwards;
 	@keyframes slideIn-r {
 		from {
 			scale: 0.5;
