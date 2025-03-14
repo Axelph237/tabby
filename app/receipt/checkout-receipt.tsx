@@ -40,11 +40,27 @@ export default function CheckoutReceipt({
 			}
 		};
 
+		const handleScroll = () => {
+			const main = document.querySelector("main");
+			const scale = Math.min(main!.scrollTop / 100, 1);
+
+			if (scale > 0.0001) {
+				document.getElementById("checkout-header")!.style.boxShadow =
+					`0 ${scale * 5}px 6px rgba(0, 0, 0, 0.2)`;
+			} else {
+				document.getElementById("checkout-header")!.style.boxShadow = "none";
+			}
+		};
+
 		updateDashes();
 		window.addEventListener("resize", updateDashes);
+		document.querySelector("main")?.addEventListener("scroll", handleScroll);
 
 		return () => {
 			window.removeEventListener("resize", updateDashes);
+			document
+				.querySelector("main")
+				?.removeEventListener("scroll", handleScroll);
 		};
 	}, []);
 
