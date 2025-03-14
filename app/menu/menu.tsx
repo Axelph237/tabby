@@ -1,5 +1,5 @@
 import "./menu.css";
-import { Fragment, type HTMLProps, useEffect } from "react";
+import { Fragment, type HTMLProps, useEffect, useRef, useState } from "react";
 
 interface Item {
 	name: string;
@@ -80,24 +80,20 @@ export default function Menu() {
 				/>
 			</div>
 
-			<div className="flex h-full flex-col justify-end pr-[15px] pl-[15px]">
+			<div className="flex h-full flex-col justify-end px-[15px]">
 				{/* Menu */}
 				<div
 					id="menu-container"
-					className="relative flex max-h-4/5 animate-beckon flex-col md:max-h-3/4 lg:max-h-2/3"
+					className="gooey relative flex max-h-4/5 animate-beckon flex-col md:max-h-3/4 lg:max-h-2/3"
 				>
 					<div className="flex flex-row items-end justify-end">
-						{/*<div className="relative bg-accent w-1/2 h-[85px] rounded-tl-2xl rounded-tr-2xl">*/}
-						{/*    <div className="absolute bottom-0 right-0 tl-corner w-[30px] h-[30px] bg-primary"></div>*/}
-						{/*</div>*/}
-						<div className="tl-corner h-[16px] w-[16px] bg-primary"></div>
-						<div className="relative right-0 h-[85px] w-1/2 rounded-tl-2xl rounded-tr-2xl bg-primary">
+						<div className="relative right-0 h-[85px] w-1/2 bg-primary">
 							<h1 className="flex items-center justify-center font-dongle text-[64px] font-semibold text-accent">
 								Menu
 							</h1>
 						</div>
 					</div>
-					<div className="z-50 rounded-tl-2xl rounded-br-2xl rounded-bl-2xl bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]">
+					<div className="z-50 bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]">
 						<ul className="flex flex-col items-center gap-10">
 							{testItems.map((item, i) => (
 								<Fragment key={i}>
@@ -117,20 +113,40 @@ interface MenuItemProps extends HTMLProps<HTMLDivElement> {
 }
 
 function MenuItem(props: MenuItemProps) {
+	const [clicked, setClicked] = useState(false);
+	const inputRef = useRef(null);
+
+	const handleAdd = () => {
+		if (!clicked) setClicked(true);
+
+		if (!inputRef.current) return;
+
+		const input = inputRef.current as HTMLInputElement;
+		input.value = String(Number(input.value) + 1);
+	};
+
+	const handleSub = () => {
+		if (
+			!inputRef.current ||
+			Number((inputRef.current as HTMLInputElement).value) <= 0
+		)
+			return;
+
+		const input = inputRef.current as HTMLInputElement;
+		input.value = String(Number(input.value) - 1);
+	};
+
 	return (
 		<div
 			className="relative flex w-full justify-center"
 			{...props}
 		>
 			{/* shape */}
-			<div className="absolute flex w-full flex-row">
+			<div className="content-aware-shadow gooey absolute flex w-full flex-row">
 				{/* shape - body */}
-				<div className="h-[200px] w-2/3 rounded-tl-2xl rounded-br-2xl rounded-bl-2xl bg-secondary"></div>
+				<div className="h-[200px] w-2/3 bg-secondary"></div>
 				{/* shape - info */}
-				<div className="flex w-1/3 flex-col">
-					<div className="h-[150px] w-full rounded-tr-2xl rounded-br-2xl bg-secondary"></div>
-					<div className="br-corner h-[16px] w-[16px] bg-secondary"></div>
-				</div>
+				<div className="h-[150px] w-1/3 bg-secondary"></div>
 			</div>
 			{/* Sections */}
 			<div className="relative flex h-[200px] w-full flex-row gap-[10px] p-[10px]">
@@ -156,10 +172,36 @@ function MenuItem(props: MenuItemProps) {
 				</div>
 
 				{/* Buttons */}
-				<div className="absolute right-0 bottom-0 flex h-[50px] w-1/3 items-center justify-center p-[5px]">
-					<div className="flex size-full cursor-pointer items-center justify-center rounded-xl bg-accent font-bold">
-						Add
-					</div>
+				<div className="absolute right-0 bottom-0 flex h-[50px] w-1/3 items-center justify-center justify-evenly p-[5px] md:justify-center md:gap-[20px]">
+					{!clicked ? (
+						<button
+							className="btn size-full"
+							onClick={handleAdd}
+						>
+							Add
+						</button>
+					) : (
+						<>
+							<button
+								className="btn relative aspect-square h-full animate-slideIn-r"
+								onClick={handleSub}
+							>
+								-
+							</button>
+							<input
+								value="0"
+								type="number"
+								className="h-full w-[50px] rounded-xl bg-accent text-center font-red-hat-text font-bold"
+								ref={inputRef}
+							/>
+							<button
+								className="btn relative aspect-square h-full animate-slideIn-l"
+								onClick={handleAdd}
+							>
+								+
+							</button>
+						</>
+					)}
 				</div>
 			</div>
 		</div>

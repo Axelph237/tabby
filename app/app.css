@@ -43,14 +43,6 @@
 	}
 
 	--animate-beckon: 500ms 600ms beckon linear;
-	@keyframes slideUp {
-		from {
-			top: 200px;
-		}
-		to {
-			top: 0;
-		}
-	}
 	@keyframes beckon {
 		0% {
 			top: 0;
@@ -68,6 +60,30 @@
 			top: 0;
 		}
 	}
+
+	--animate-slideIn-l: slideIn-l 300ms ease-out forwards;
+	@keyframes slideIn-l {
+		from {
+			scale: 0.5;
+			left: -30px;
+		}
+		to {
+			scale: 1;
+			left: 0;
+		}
+	}
+
+	--animate-slideIn-r: slideIn-r 300ms ease-out forwards;
+	@keyframes slideIn-r {
+		from {
+			scale: 0.5;
+			left: 30px;
+		}
+		to {
+			scale: 1;
+			left: 0;
+		}
+	}
 }
 
 html,
@@ -79,23 +95,35 @@ body {
 	}
 }
 
+.btn {
+	@apply flex cursor-pointer items-center justify-center rounded-xl bg-accent font-red-hat-text font-bold;
+}
+
 /* Rounded corners (16px only) */
 .br-corner {
 	mask-image: url("public/br-corner16.svg");
 	mask-position: 0 0;
 }
-
 .bl-corner {
 	mask-image: url("public/bl-corner16.svg");
 	mask-size: 100%;
 }
-
 .tl-corner {
 	mask-image: url("public/tl-corner16.svg");
 	mask-size: 100%;
 }
-
 .tr-corner {
 	mask-image: url("public/tr-corner16.svg");
 	mask-size: 100%;
+}
+
+/* Filters */
+.content-aware-shadow {
+	-webkit-filter: url("#dropshadow");
+	filter: url("#dropshadow");
+}
+
+.gooey {
+	-webkit-filter: url("#goo");
+	filter: url("#goo");
 }

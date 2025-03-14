@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* Hide scrollbar but allow scrolling */
 .no-scroll {
 	-ms-overflow-style: none; /* For Internet Explorer and Edge */
@@ -11,4 +13,17 @@
 
 #order-page-img {
 	mask-image: linear-gradient(black 40%, transparent);
+}
+
+/* Style for the number input */
+input[type="number"] {
+	outline: none;
+}
+
+/* Customizing the number input buttons (WebKit browsers) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+	position: absolute;
+	opacity: 0;
+	visibility: hidden;
 }
