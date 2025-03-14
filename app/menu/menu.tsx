@@ -1,13 +1,21 @@
 import "./menu.css";
-import { Fragment, type HTMLProps, useEffect, useRef, useState } from "react";
+import {
+	type ChangeEvent,
+	Fragment,
+	type HTMLProps,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
+import { ReceiptIcon } from "~/components/icons";
 
-interface Item {
+export interface Item {
 	name: string;
 	img?: string;
 	description?: string;
 }
 
-const testItems: Item[] = [
+export const testItems: Item[] = [
 	{
 		name: "Matcha Latte",
 		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
@@ -27,14 +35,34 @@ const testItems: Item[] = [
 			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
 	},
 	{
-		name: "Gibraltar",
-		img: "https://i.pinimg.com/736x/39/7f/80/397f8000561719de89e66f18a02f81d0.jpg",
+		name: "Matcha Latte",
+		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
 		description:
-			"Equal parts craft-brewed espresso and fresh cow’s milk. A gentle, fruity flavor with a creamy mouthfeel.",
+			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
+	},
+	{
+		name: "Matcha Latte",
+		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
+		description:
+			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
+	},
+	{
+		name: "Matcha Latte",
+		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
+		description:
+			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
+	},
+	{
+		name: "Matcha Latte",
+		img: "https://i.pinimg.com/736x/e9/a6/9b/e9a69b322c3fdec10b5448e4616095d3.jpg",
+		description:
+			"Ceremonial grade matcha whisked and served atop whole cow’s milk. House cold foam available on request.",
 	},
 ];
 
 export default function Menu() {
+	const [itemCount, setItemCount] = useState(0);
+
 	useEffect(() => {
 		const handleScroll = () => {
 			const main = document.getElementById("order-page-main");
@@ -66,6 +94,40 @@ export default function Menu() {
 		};
 	}, []);
 
+	const handleUpdate = (item: Item, count: number) => {
+		console.log("Adding items");
+
+		const parent = document.getElementById("checkout-btn-container");
+		if (parent) {
+			console.log("pebbling");
+			const parentRect = parent.getBoundingClientRect();
+			const pebble = document.createElement("div");
+			pebble.style.zIndex = "-1";
+			pebble.style.position = "absolute";
+			pebble.style.background = "var(--color-accent)";
+			pebble.style.borderRadius = "1000px";
+			pebble.style.width = "30px";
+			pebble.style.height = "30px";
+			pebble.style.transform = "translateX(-50%)";
+			pebble.style.left =
+				(Math.random() * parentRect.width) / 2 + parentRect.width / 4 + "px";
+			pebble.style.top = "-30px";
+
+			if (itemCount + count > itemCount) {
+				pebble.classList.add("animate-dropIn");
+			} else {
+				pebble.classList.add("animate-dropOut");
+			}
+			parent.appendChild(pebble);
+
+			setTimeout(() => {
+				parent.removeChild(pebble);
+			}, 1000);
+		}
+
+		setItemCount(itemCount + count);
+	};
+
 	return (
 		<main
 			id="order-page-main"
@@ -80,11 +142,25 @@ export default function Menu() {
 				/>
 			</div>
 
+			<div
+				id="checkout-btn-container"
+				className="gooey fixed bottom-10 left-10 z-[9999]"
+			>
+				<button
+					id="checkout-button"
+					className="flex cursor-pointer flex-row gap-2 bg-accent px-6 py-4 font-bold"
+				>
+					<ReceiptIcon className="icon-sm" />
+					<span className="hidden md:block">Checkout</span>
+					<span className={`${itemCount <= 0 && "hidden"}`}>({itemCount})</span>
+				</button>
+			</div>
+
 			<div className="flex h-full flex-col justify-end px-[15px]">
 				{/* Menu */}
 				<div
 					id="menu-container"
-					className="gooey relative flex max-h-4/5 animate-beckon flex-col md:max-h-3/4 lg:max-h-2/3"
+					className="gooey relative flex max-h-4/5 flex-col md:max-h-3/4 lg:max-h-2/3"
 				>
 					<div className="flex flex-row items-end justify-end">
 						<div className="relative right-0 h-[85px] w-1/2 bg-primary">
@@ -97,7 +173,10 @@ export default function Menu() {
 						<ul className="flex flex-col items-center gap-10">
 							{testItems.map((item, i) => (
 								<Fragment key={i}>
-									<MenuItem item={item} />
+									<MenuItem
+										item={item}
+										onUpdate={handleUpdate}
+									/>
 								</Fragment>
 							))}
 						</ul>
@@ -110,30 +189,29 @@ export default function Menu() {
 
 interface MenuItemProps extends HTMLProps<HTMLDivElement> {
 	item: Item;
+	onUpdate: (item: Item, count: number) => void;
 }
 
 function MenuItem(props: MenuItemProps) {
+	const [count, setCount] = useState(0);
 	const [clicked, setClicked] = useState(false);
-	const inputRef = useRef(null);
 
 	const handleAdd = () => {
 		if (!clicked) setClicked(true);
 
-		if (!inputRef.current) return;
+		setCount(count + 1);
 
-		const input = inputRef.current as HTMLInputElement;
-		input.value = String(Number(input.value) + 1);
+		// Call parent function
+		props.onUpdate(props.item, 1);
 	};
 
 	const handleSub = () => {
-		if (
-			!inputRef.current ||
-			Number((inputRef.current as HTMLInputElement).value) <= 0
-		)
-			return;
+		if (count <= 0) return;
 
-		const input = inputRef.current as HTMLInputElement;
-		input.value = String(Number(input.value) - 1);
+		setCount(count - 1);
+
+		// Call parent function
+		props.onUpdate(props.item, -1);
 	};
 
 	return (
@@ -188,12 +266,9 @@ function MenuItem(props: MenuItemProps) {
 							>
 								-
 							</button>
-							<input
-								value="0"
-								type="number"
-								className="h-full w-[50px] rounded-xl bg-accent text-center font-red-hat-text font-bold"
-								ref={inputRef}
-							/>
+							<div className="item-count-input flex h-full w-[50px] items-center justify-center rounded-xl bg-accent font-red-hat-text font-bold">
+								{count}
+							</div>
 							<button
 								className="btn relative aspect-square h-full animate-slideIn-l"
 								onClick={handleAdd}

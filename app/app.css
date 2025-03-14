@@ -15,6 +15,10 @@
 	--font-red-hat-display: "Red Hat Display", "sans-serif";
 	--font-red-hat-mono: "Red Hat Mono", "sans-serif";
 
+	--icon-size-sm: 1.5rem;
+	--icon-size-md: 2.5rem;
+	--icon-size-lg: 4rem;
+
 	--animate-wiggle: wiggle 1s ease-in-out infinite;
 	@keyframes wiggle {
 		0%,
@@ -84,6 +88,31 @@
 			left: 0;
 		}
 	}
+
+	--animate-dropIn: dropIn 1s ease-in-out forwards;
+	@keyframes dropIn {
+		from {
+			top: -200px;
+		}
+		to {
+			top: 0;
+		}
+	}
+
+	--animate-dropOut: dropOut 1s ease-in forwards;
+	@keyframes dropOut {
+		from {
+			top: 0;
+		}
+		to {
+			top: 200px;
+		}
+	}
+}
+
+@utility icon-* {
+	width: --value(--icon-size- *);
+	height: --value(--icon-size- *);
 }
 
 html,
@@ -97,6 +126,14 @@ body {
 
 .btn {
 	@apply flex cursor-pointer items-center justify-center rounded-xl bg-accent font-red-hat-text font-bold;
+}
+
+.layered {
+	@apply grid grid-cols-1 grid-rows-1;
+
+	> * {
+		@apply col-start-1 row-start-1;
+	}
 }
 
 /* Rounded corners (16px only) */
