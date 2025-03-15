@@ -1,18 +1,18 @@
-import "./menu.css";
+import "./menu-list.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
 import ItemType from "~/lib/item";
 import { tItemTypes } from "~/lib/testTypes";
 import { Link } from "react-router";
 
-export default function Menu() {
+export default function MenuList() {
 	const [itemCount, setItemCount] = useState(0);
 
 	useEffect(() => {
 		const handleScroll = () => {
 			const main = document.getElementById("order-page-main");
 			const menuRect = document
-				.getElementById("menu-container")
+				.getElementById("menu-list-container")
 				?.getBoundingClientRect();
 
 			if (!main || !menuRect) return;
@@ -103,7 +103,7 @@ export default function Menu() {
 			</Link>
 
 			<div className="flex h-full flex-col justify-end px-[15px]">
-				{/* Menu */}
+				{/* MenuList */}
 				<div
 					id="menu-container"
 					className="gooey relative flex max-h-4/5 flex-col md:max-h-3/4 lg:max-h-2/3"
