@@ -1,6 +1,18 @@
 import { BurgerIcon, FireIcon, SendIcon, TabbyLogo } from "~/components/icons";
+import "../../public/styles/status.css";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+
+enum OrderStatus {
+	"Cancelled" = -1,
+	"Preparing",
+	"Ready",
+}
 
 export default function QueuePage() {
+	const navigate = useNavigate();
+	const [status, setStatus] = useState<OrderStatus>(OrderStatus.Preparing);
+
 	return (
 		<main className="h-screen">
 			<div className="flex h-full flex-col">
@@ -25,7 +37,7 @@ export default function QueuePage() {
 					<div className="flex flex-row items-center px-[30px]">
 						{/* icons */}
 						<div
-							className={`${true ? "border-transparent bg-secondary" : "border-secondary bg-primary text-secondary"} relative col-start-1 row-start-1 flex aspect-square h-[48px] items-center justify-center rounded-full border-4`}
+							className={`${status >= OrderStatus.Preparing ? "border-transparent bg-secondary" : "border-secondary bg-primary text-secondary"} relative col-start-1 row-start-1 flex aspect-square h-[48px] items-center justify-center rounded-full border-4`}
 						>
 							<SendIcon className="icon-sm" />
 							<h2 className="absolute top-[115%] text-[20px] font-semibold text-secondary">
@@ -33,23 +45,28 @@ export default function QueuePage() {
 							</h2>
 						</div>
 
-						<svg
-							width="100%"
-							height="50"
-							className="col-start-1 col-end-1 row-start-1"
-						>
-							<line
-								x1="0"
-								y1="25"
-								x2="100%"
-								y2="25"
-								stroke="var(--color-secondary)"
-								stroke-width="4"
-							/>
-						</svg>
+						<div className="flex w-full flex-row">
+							<svg
+								width="100%"
+								height="50"
+								className={`col-start-1 col-end-1 row-start-1 ${status === OrderStatus.Preparing && "spread-out"}`}
+							>
+								<line
+									x1="0"
+									y1="25"
+									x2="100%"
+									y2="25"
+									stroke="var(--color-secondary)"
+									strokeWidth="4"
+									strokeDasharray={
+										status >= OrderStatus.Preparing ? "" : "10,5"
+									}
+								/>
+							</svg>
+						</div>
 
 						<div
-							className={`${false ? "border-transparent bg-secondary" : "border-secondary bg-primary text-secondary"} relative col-start-2 row-start-1 flex aspect-square h-[48px] items-center justify-center rounded-full border-4`}
+							className={`${status >= OrderStatus.Preparing ? "border-transparent bg-secondary" : "border-secondary bg-primary text-secondary"} relative col-start-2 row-start-1 flex aspect-square h-[48px] items-center justify-center rounded-full border-4`}
 						>
 							<FireIcon className="icon-sm" />
 							<h2 className="absolute top-[115%] text-[20px] font-semibold text-secondary">
@@ -57,24 +74,26 @@ export default function QueuePage() {
 							</h2>
 						</div>
 
-						<svg
-							width="100%"
-							height="50"
-							className="col-start-2 col-end-2 row-start-1"
-						>
-							<line
-								x1="0"
-								y1="25"
-								x2="100%"
-								y2="25"
-								stroke="var(--color-secondary)"
-								stroke-width="4"
-								stroke-dasharray="10,5"
-							/>
-						</svg>
+						<div className="flex w-full flex-row">
+							<svg
+								width="100%"
+								height="50"
+								className={`col-start-1 col-end-1 row-start-1 ${status >= OrderStatus.Ready && "spread-out"}`}
+							>
+								<line
+									x1="0"
+									y1="25"
+									x2="100%"
+									y2="25"
+									stroke="var(--color-secondary)"
+									strokeWidth="4"
+									strokeDasharray={status >= OrderStatus.Ready ? "" : "10,5"}
+								/>
+							</svg>
+						</div>
 
 						<div
-							className={`${false ? "border-transparent bg-secondary" : "border-secondary bg-primary text-secondary"} relative col-start-3 row-start-1 flex aspect-square h-[48px] items-center justify-center rounded-full border-4`}
+							className={`${status >= OrderStatus.Ready ? "border-transparent bg-secondary" : "border-secondary bg-primary text-secondary"} relative col-start-3 row-start-1 flex aspect-square h-[48px] items-center justify-center rounded-full border-4`}
 						>
 							<BurgerIcon className="icon-sm" />
 							<h2 className="absolute top-[115%] text-[20px] font-semibold text-secondary">
