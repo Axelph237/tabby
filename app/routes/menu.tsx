@@ -10,7 +10,6 @@ export default function MenuPage() {
 
 	useEffect(() => {
 		const handleScroll = () => {
-			console.log("Scrolling");
 			const main = document.getElementById("order-page-main");
 			const menuRect = document
 				.getElementById("menu-container")
@@ -41,11 +40,8 @@ export default function MenuPage() {
 	}, []);
 
 	const handleUpdate = (item: ItemType, count: number) => {
-		console.log("Adding items");
-
 		const parent = document.getElementById("checkout-btn-container");
 		if (parent) {
-			console.log("pebbling");
 			const parentRect = parent.getBoundingClientRect();
 			const pebble = document.createElement("div");
 			pebble.style.zIndex = "-1";
