@@ -73,7 +73,7 @@ export default class ItemType {
 			name: this.name,
 			description: this.description,
 			imgUrl: this.imgUrl,
-			id: this.id,
+			typeId: this.id,
 			selections: [],
 			totalPrice: this.basePrice,
 		};
@@ -167,7 +167,7 @@ export interface Item {
 	name: string;
 	imgUrl: string | undefined;
 	description: string;
-	id: string;
+	typeId: string;
 	selections: ItemTypeSelection[];
 	totalPrice: number;
 }
@@ -176,7 +176,7 @@ const ItemSchema = z.object({
 	name: z.string(),
 	imgUrl: z.string().optional(),
 	description: z.string(),
-	id: z.string(),
+	typeId: z.string(),
 	selections: z.array(
 		z.object({
 			optName: z.string(),
