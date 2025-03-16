@@ -37,27 +37,27 @@ export default function CheckoutPage() {
 			}
 		};
 
-		const handleScroll = () => {
-			const main = document.querySelector("main");
-			const scale = Math.min(main!.scrollTop / 100, 1);
-
-			if (scale > 0.0001) {
-				document.getElementById("checkout-header")!.style.boxShadow =
-					`0 ${scale * 5}px 6px rgba(0, 0, 0, 0.2)`;
-			} else {
-				document.getElementById("checkout-header")!.style.boxShadow = "none";
-			}
-		};
+		// const handleScroll = () => {
+		// 	const main = document.querySelector("main");
+		// 	const scale = Math.min(main!.scrollTop / 100, 1);
+		//
+		// 	if (scale > 0.0001) {
+		// 		document.getElementById("checkout-header")!.style.boxShadow =
+		// 			`0 ${scale * 5}px 6px rgba(0, 0, 0, 0.2)`;
+		// 	} else {
+		// 		document.getElementById("checkout-header")!.style.boxShadow = "none";
+		// 	}
+		// };
 
 		updateDashes();
 		window.addEventListener("resize", updateDashes);
-		document.querySelector("main")?.addEventListener("scroll", handleScroll);
+		// document.querySelector("main")?.addEventListener("scroll", handleScroll);
 
 		return () => {
 			window.removeEventListener("resize", updateDashes);
-			document
-				.querySelector("main")
-				?.removeEventListener("scroll", handleScroll);
+			// document
+			// 	.querySelector("main")
+			// 	?.removeEventListener("scroll", handleScroll);
 		};
 	}, []);
 
@@ -75,19 +75,18 @@ export default function CheckoutPage() {
 
 	return (
 		<main className="h-screen overflow-y-auto">
-			{/* header */}
-			<div
-				id="checkout-header"
-				className="sticky top-0 z-10 flex w-full flex-row items-center justify-between bg-primary px-6 text-accent"
-			>
-				<h1 className="font-dongle text-[64px]">Tabby</h1>
-				<TabbyLogo className="h-26 w-26" />
-			</div>
-
 			<div
 				id="checkout-container"
 				className="relative flex h-fit min-h-screen flex-col items-center justify-start gap-[25px] bg-primary p-[20px] text-accent"
 			>
+				{/* header */}
+				<div
+					id="checkout-header"
+					className="top-0 z-10 flex w-full flex-row items-center justify-between bg-primary text-accent"
+				>
+					<h1 className="font-dongle text-[64px]">Tabby</h1>
+					<TabbyLogo className="h-26 w-26" />
+				</div>
 				{/* body */}
 				<div
 					id="checkout-body"
