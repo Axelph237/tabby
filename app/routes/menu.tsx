@@ -2,7 +2,7 @@ import "../../public/styles/menu.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
 import ItemType from "~/lib/item";
-import { tItemTypes } from "~/lib/testTypes";
+import { getTestTypes, tItemTypes } from "~/lib/testTypes";
 import { Link } from "react-router";
 
 export default function MenuPage() {
@@ -78,7 +78,7 @@ export default function MenuPage() {
 			id="order-page-main"
 			className="no-scroll h-screen w-screen overflow-y-auto"
 		>
-			<div className="fixed h-1/3 w-full lg:h-1/2">
+			<div className="fixed h-1/2 w-full lg:h-1/2">
 				<img
 					id="order-page-img"
 					src="../../public/test-menu-img.jpg"
@@ -106,7 +106,7 @@ export default function MenuPage() {
 				{/* Menu */}
 				<div
 					id="menu-container"
-					className="gooey relative flex max-h-4/5 flex-col md:max-h-3/4 lg:max-h-2/3"
+					className="gooey relative flex max-h-2/3 flex-col"
 				>
 					<div className="flex flex-row items-end justify-end">
 						<div className="relative right-0 h-[85px] w-1/2 bg-primary">
@@ -117,7 +117,7 @@ export default function MenuPage() {
 					</div>
 					<div className="z-50 bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]">
 						<ul className="flex flex-col items-center gap-10">
-							{tItemTypes.map((item, i) => (
+							{getTestTypes(10).map((item, i) => (
 								<Fragment key={i}>
 									<MenuItem
 										item={item}

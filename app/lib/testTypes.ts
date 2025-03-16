@@ -22,3 +22,14 @@ export const tItems: Item[] = [];
 for (let i = 0; i < NUM_ITEMS; i++) {
 	tItems.push(tItemTypes[i % tItemTypes.length].createItem([]));
 }
+
+export function getTestTypes(count: number): ItemType[] {
+	const itemTypes: ItemType[] = [];
+
+	for (let i = 0; i < count; i++) {
+		if (i % 2 == 0) itemTypes.push(matcha);
+		else itemTypes.push(gibraltar);
+	}
+
+	return itemTypes;
+}
