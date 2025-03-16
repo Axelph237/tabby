@@ -10,9 +10,10 @@ export default function MenuPage() {
 
 	useEffect(() => {
 		const handleScroll = () => {
+			console.log("Scrolling");
 			const main = document.getElementById("order-page-main");
 			const menuRect = document
-				.getElementById("menu-list-container")
+				.getElementById("menu-container")
 				?.getBoundingClientRect();
 
 			if (!main || !menuRect) return;
