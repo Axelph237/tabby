@@ -99,7 +99,7 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 			</div>
 
 			<Link
-				to="/checkout"
+				to={`/checkout/${params.menuId}`}
 				id="checkout-btn-container"
 				className="gooey fixed bottom-10 left-10 z-[9999]"
 			>

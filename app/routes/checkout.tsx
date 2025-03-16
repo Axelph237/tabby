@@ -1,11 +1,16 @@
 import { TabbyLogo } from "~/components/icons";
 import { type ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
-import type { Item } from "~/lib/item";
-import { tItems } from "~/lib/testTypes";
+import { isItem, type Item } from "~/lib/item";
+import { Router } from "react-router";
 
 const tTotal = 10.56;
 
-export default function CheckoutPage() {
+export default function CheckoutPage({
+	params,
+}: {
+	params: { menuId: string };
+}) {
+	const [cartItems, setCartItems] = useState<undefined | Item[]>(undefined);
 	const [name, setName] = useState("");
 	const inputRef = useRef(null);
 
@@ -25,6 +30,23 @@ export default function CheckoutPage() {
 	};
 
 	useEffect(() => {
+		const menuId = params.menuId;
+		const sessionData = sessionStorage.getItem(menuId);
+
+		if (sessionData) {
+			const cartData: Item[] = JSON.parse(sessionData);
+
+			const items = [];
+			for (let i = 0; i < cartData.length; i++) {
+				if (isItem(cartData[i])) items.push(cartData[i]);
+			}
+
+			setCartItems(items);
+		} else {
+			// No menu data found
+			throw Error(`Failed to find cart data for menuId ${menuId}`);
+		}
+
 		const updateDashes = () => {
 			const pt = document.getElementById("dashes-t");
 			const pb = document.getElementById("dashes-b");
@@ -86,8 +108,8 @@ export default function CheckoutPage() {
 					></p>
 
 					<ul className="flex flex-col gap-[10px] font-dongle text-[36px] text-primary">
-						{tItems &&
-							tItems.map((item, i) => (
+						{cartItems &&
+							cartItems.map((item, i) => (
 								<Fragment key={i}>
 									<CheckoutItem
 										item={item}

@@ -1,0 +1,26 @@
+/menu/:menuId
+User begins to add items to a cart. Cart is stored in session storage.
+
+Since user is a guest, data is NOT saved in database yet.
+
+When user navigates from this page to /checkout/:menuId, app appends menuId to the URL.
+
+When saving order details to session storage, it is to be saved under the menuId.
+
+/checkout/:menuId
+
+Using the passed menuId, gets the user's cart data from session storage.
+
+User must provide a name to pair with the order, and then may proceed to checkout.
+
+When user checks out, an API call is made to create the order, and then the app will route the user to the /order/:orderId/status page.
+
+/order/:orderId/status
+
+This page is for displaying the status of a particular orderId.
+
+This orderId will link to a Websocket room to provide realtime updates on the order's status.
+
+/order/:orderId/ready
+
+This page may simply become a state in /order/:orderId/status

@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export default class ItemType {
 	// READONLY member `id` is the UUID of the item type.
 	readonly id: string;
@@ -168,4 +170,21 @@ export interface Item {
 	id: string;
 	selections: ItemTypeSelection[];
 	totalPrice: number;
+}
+
+const ItemSchema = z.object({
+	name: z.string(),
+	imgUrl: z.string().optional(),
+	description: z.string(),
+	id: z.string(),
+	selections: z.array(
+		z.object({
+			optName: z.string(),
+			value: z.union([z.string(), z.array(z.string())]),
+		}),
+	),
+	totalPrice: z.number(),
+});
+export function isItem(item: Item) {
+	return ItemSchema.parse(item);
 }
