@@ -1,11 +1,11 @@
 import "../../public/styles/menu.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
-import ItemType from "~/lib/item";
+import ItemType, { type Item } from "~/lib/item";
 import { getTestTypes, tItemTypes } from "~/lib/testTypes";
 import { Link } from "react-router";
 
-export default function MenuPage() {
+export default function MenuPage({ params }: { params: { menuId: string } }) {
 	const [itemCount, setItemCount] = useState(0);
 
 	useEffect(() => {
@@ -39,7 +39,7 @@ export default function MenuPage() {
 		};
 	}, []);
 
-	const handleUpdate = (item: ItemType, count: number) => {
+	const createPebbleEffect = (dropIn: boolean) => {
 		const parent = document.getElementById("checkout-btn-container");
 		if (parent) {
 			const parentRect = parent.getBoundingClientRect();
@@ -55,7 +55,7 @@ export default function MenuPage() {
 				(Math.random() * parentRect.width) / 2 + parentRect.width / 4 + "px";
 			pebble.style.top = "-30px";
 
-			if (itemCount + count > itemCount) {
+			if (dropIn) {
 				pebble.classList.add("animate-dropIn");
 			} else {
 				pebble.classList.add("animate-dropOut");
@@ -66,8 +66,22 @@ export default function MenuPage() {
 				parent.removeChild(pebble);
 			}, 1000);
 		}
+	};
 
+	const handleUpdate = (item: Item, count: number) => {
 		setItemCount(itemCount + count);
+
+		const menuId = params.menuId;
+		const sessionData = sessionStorage.getItem(menuId);
+
+		if (sessionData) {
+			const cartData = JSON.parse(sessionData);
+			sessionStorage.setItem(menuId, JSON.stringify([...cartData, item]));
+		} else {
+			sessionStorage.setItem(menuId, JSON.stringify([item]));
+		}
+
+		createPebbleEffect(itemCount + count > itemCount);
 	};
 
 	return (
@@ -132,7 +146,7 @@ export default function MenuPage() {
 
 interface MenuItemProps extends HTMLProps<HTMLDivElement> {
 	item: ItemType;
-	onUpdate: (item: ItemType, count: number) => void;
+	onUpdate: (item: Item, count: number) => void;
 }
 
 function MenuItem(props: MenuItemProps) {
@@ -145,7 +159,7 @@ function MenuItem(props: MenuItemProps) {
 		setCount(count + 1);
 
 		// Call parent function
-		props.onUpdate(props.item, 1);
+		props.onUpdate(props.item.createItem([]), 1);
 	};
 
 	const handleSub = () => {
@@ -154,7 +168,7 @@ function MenuItem(props: MenuItemProps) {
 		setCount(count - 1);
 
 		// Call parent function
-		props.onUpdate(props.item, -1);
+		props.onUpdate(props.item.createItem([]), -1);
 	};
 
 	return (
