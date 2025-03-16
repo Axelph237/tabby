@@ -77,7 +77,7 @@ export default function CheckoutPage() {
 		<main className="h-screen overflow-y-auto">
 			<div
 				id="checkout-container"
-				className="relative flex h-fit min-h-screen flex-col items-center justify-start gap-[25px] bg-primary p-[20px] text-accent"
+				className="relative flex h-fit min-h-screen flex-col items-center justify-start gap-[25px] bg-primary px-[20px] text-accent"
 			>
 				{/* header */}
 				<div

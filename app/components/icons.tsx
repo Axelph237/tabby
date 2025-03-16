@@ -53,3 +53,51 @@ export function TabbyLogo(props: SVGProps<SVGSVGElement>) {
 		</svg>
 	);
 }
+
+export function FireIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			fill="currentColor"
+			width="800px"
+			height="800px"
+			viewBox="-64 0 512 512"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path d="M216 23.86c0-23.8-30.65-32.77-44.15-13.04C48 191.85 224 200 224 288c0 35.63-29.11 64.46-64.85 63.99-35.17-.45-63.15-29.77-63.15-64.94v-85.51c0-21.7-26.47-32.23-41.43-16.5C27.8 213.16 0 261.33 0 320c0 105.87 86.13 192 192 192s192-86.13 192-192c0-170.29-168-193-168-296.14z" />
+		</svg>
+	);
+}
+
+export function BurgerIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			fill="currentColor"
+			width="800px"
+			height="800px"
+			viewBox="0 0 512 512"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path d="M464 256H48a48 48 0 0 0 0 96h416a48 48 0 0 0 0-96zm16 128H32a16 16 0 0 0-16 16v16a64 64 0 0 0 64 64h352a64 64 0 0 0 64-64v-16a16 16 0 0 0-16-16zM58.64 224h394.72c34.57 0 54.62-43.9 34.82-75.88C448 83.2 359.55 32.1 256 32c-103.54.1-192 51.2-232.18 116.11C4 180.09 24.07 224 58.64 224zM384 112a16 16 0 1 1-16 16 16 16 0 0 1 16-16zM256 80a16 16 0 1 1-16 16 16 16 0 0 1 16-16zm-128 32a16 16 0 1 1-16 16 16 16 0 0 1 16-16z" />
+		</svg>
+	);
+}
+
+export function SendIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			width="21"
+			height="20"
+			viewBox="0 0 21 20"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M19.0954 0.123162L0.987941 10.5696C0.280834 10.9759 0.370687 11.9604 1.07389 12.2573L5.22668 13.9997L16.4505 4.10796C16.6654 3.91654 16.9701 4.20954 16.7865 4.43222L7.37534 15.8983V19.0432C7.37534 19.9651 8.48874 20.3285 9.03568 19.6604L11.5164 16.6406L16.3841 18.6798C16.9389 18.9142 17.5718 18.5665 17.6733 17.9688L20.4861 1.09202C20.619 0.302869 19.7712 -0.267505 19.0954 0.123162Z"
+				fill="currentColor"
+			/>
+		</svg>
+	);
+}
