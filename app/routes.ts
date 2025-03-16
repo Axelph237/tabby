@@ -5,4 +5,5 @@ export default [
 	route("/menu", "routes/menu.tsx"),
 	route("/checkout", "routes/checkout.tsx"),
 	route("/order/status", "routes/status.tsx"),
+	route("/order/ready", "routes/ready.tsx"),
 ] satisfies RouteConfig;

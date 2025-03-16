@@ -101,3 +101,21 @@ export function SendIcon(props: SVGProps<SVGSVGElement>) {
 		</svg>
 	);
 }
+
+export function CheckIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			width="100"
+			height="76"
+			viewBox="0 0 100 76"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M33.9644 73.8211L1.4644 41.3211C-0.488135 39.3686 -0.488135 36.2027 1.4644 34.25L8.5353 27.1789C10.4878 25.2262 13.6539 25.2262 15.6064 27.1789L37.5 49.0723L84.3935 2.17891C86.3461 0.226373 89.5121 0.226373 91.4646 2.17891L98.5355 9.25001C100.488 11.2025 100.488 14.3684 98.5355 16.3211L41.0355 73.8213C39.0828 75.7738 35.9169 75.7738 33.9644 73.8211Z"
+				fill="currentColor"
+			/>
+		</svg>
+	);
+}
