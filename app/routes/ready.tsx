@@ -27,7 +27,7 @@ export default function QueuePage() {
 						Your Order Is Ready
 					</h1>
 
-					<div className="flex aspect-square w-1/2 items-center justify-center rounded-full border-3 border-primary shadow-xl">
+					<div className="flex aspect-square w-1/2 max-w-[300px] items-center justify-center rounded-full border-3 border-primary shadow-xl">
 						<CheckIcon className="aspect-square w-full" />
 					</div>
 
