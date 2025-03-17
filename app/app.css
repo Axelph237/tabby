@@ -108,6 +108,16 @@
 			top: 200px;
 		}
 	}
+
+	--animate-slideUpOut: slideUpOut 500ms ease-in forwards;
+	@keyframes slideUpOut {
+		from {
+			top: 0;
+		}
+		to {
+			top: -1000px;
+		}
+	}
 }
 
 @utility icon-* {

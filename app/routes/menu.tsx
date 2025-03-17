@@ -148,6 +148,7 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 				to={`/checkout/${params.menuId}`}
 				id="checkout-btn-container"
 				className="gooey fixed bottom-10 left-10 z-[9999]"
+				viewTransition
 			>
 				<button
 					id="checkout-button"
@@ -159,7 +160,7 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 				</button>
 			</Link>
 
-			<div className="flex h-full flex-col justify-end px-[15px]">
+			<div className={`relative flex h-full flex-col justify-end px-[15px]`}>
 				{/* Menu */}
 				<div
 					id="menu-container"
@@ -180,7 +181,7 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 										<Fragment key={i}>
 											<MenuItem
 												item={itemTypeData.type}
-												itemChildren={itemTypeData.children}
+												itemchildren={itemTypeData.children}
 												onUpdate={handleUpdate}
 											/>
 										</Fragment>
@@ -196,13 +197,13 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 
 interface MenuItemProps extends HTMLProps<HTMLDivElement> {
 	item: ItemType;
-	itemChildren: Item[];
+	itemchildren: Item[];
 	onUpdate: (item: Item, count: number) => void;
 }
 
 function MenuItem(props: MenuItemProps) {
-	const [count, setCount] = useState(props.itemChildren.length);
-	const [clicked, setClicked] = useState(props.itemChildren.length > 0);
+	const [count, setCount] = useState(props.itemchildren.length);
+	const [clicked, setClicked] = useState(props.itemchildren.length > 0);
 
 	const handleAdd = () => {
 		if (!clicked) setClicked(true);
