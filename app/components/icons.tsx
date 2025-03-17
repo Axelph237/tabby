@@ -119,3 +119,21 @@ export function CheckIcon(props: SVGProps<SVGSVGElement>) {
 		</svg>
 	);
 }
+
+export function PlayIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			width="23"
+			height="26"
+			viewBox="0 0 23 26"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M21.2852 10.9834L4.09766 0.822287C2.70117 -0.00290796 0.5625 0.797873 0.5625 2.83889V23.1563C0.5625 24.9873 2.5498 26.0908 4.09766 25.1729L21.2852 15.0166C22.8184 14.1133 22.8232 11.8867 21.2852 10.9834Z"
+				fill="currentColor"
+			/>
+		</svg>
+	);
+}
