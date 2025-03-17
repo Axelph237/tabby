@@ -75,6 +75,7 @@ export default class ItemType {
 			imgUrl: this.imgUrl,
 			typeId: this.id,
 			selections: [],
+			selectKey: JSON.stringify([]),
 			totalPrice: this.basePrice,
 		};
 
@@ -118,6 +119,8 @@ export default class ItemType {
 				}
 			}
 		}
+		// Select key co-identifies an item with its typeId
+		item.selectKey = JSON.stringify(item.selections.sort());
 
 		return item;
 	};
@@ -169,6 +172,7 @@ export interface Item {
 	description: string;
 	typeId: string;
 	selections: ItemTypeSelection[];
+	selectKey: string;
 	totalPrice: number;
 }
 
@@ -183,6 +187,7 @@ const ItemSchema = z.object({
 			value: z.union([z.string(), z.array(z.string())]),
 		}),
 	),
+	selectKey: z.string(),
 	totalPrice: z.number(),
 });
 export function isItem(item: Item) {

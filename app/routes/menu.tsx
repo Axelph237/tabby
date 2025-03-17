@@ -108,7 +108,23 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 		// Update menu data
 		const itemType = menuItemTypes?.get(item.typeId);
 		if (itemType) {
-			itemType.children.push(item);
+			if (count > 0) {
+				for (let i = 0; i < count; i++) itemType.children.push(item);
+			} else {
+				// Remove all items of same type
+				// TODO FAR improve the time complexity of this code (current N^2 for simple operation)
+				// TODO Likely needs rewrite of whole session data system to instead track selectKey types in the storage itself
+				for (let i = 0; i < -1 * count; i++) {
+					const index = itemType.children.findIndex(
+						(it) =>
+							it.typeId === item.typeId && item.selectKey === it.selectKey,
+					);
+					// Remove item if found
+					if (index >= 0) {
+						itemType.children.splice(index, 1);
+					}
+				}
+			}
 			menuItemTypes?.set(item.typeId, itemType);
 			setMenuItemTypes(menuItemTypes);
 			setItemCount(itemCount + count);
@@ -121,8 +137,21 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 
 		// Update session data
 		if (sessionData) {
-			const cartData = JSON.parse(sessionData);
-			sessionStorage.setItem(menuId, JSON.stringify([...cartData, item]));
+			const cartData: Item[] = JSON.parse(sessionData);
+
+			if (count > 0) {
+				for (let i = 0; i < count; i++) cartData.push(item);
+			} else {
+				for (let i = 0; i < -1 * count; i++) {
+					// Remove each item from the cart data
+					const index = cartData.findIndex(
+						(it) =>
+							it.typeId === item.typeId && it.selectKey === item.selectKey,
+					);
+					cartData.splice(index, 1);
+				}
+			}
+			sessionStorage.setItem(menuId, JSON.stringify(cartData));
 		} else {
 			sessionStorage.setItem(menuId, JSON.stringify([item]));
 		}
@@ -152,7 +181,7 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 			>
 				<button
 					id="checkout-button"
-					className="flex cursor-pointer flex-row gap-2 bg-accent px-6 py-4 font-bold"
+					className="flex cursor-pointer flex-row gap-2 bg-accent px-6 py-4 font-bold transition-all duration-200 hover:text-secondary"
 				>
 					<ReceiptIcon className="icon-sm" />
 					<span className="hidden md:block">Checkout</span>
@@ -270,7 +299,7 @@ function MenuItem(props: MenuItemProps) {
 					) : (
 						<>
 							<button
-								className="btn relative aspect-square h-full animate-slideIn-r"
+								className="btn relative aspect-square h-full animate-slideIn-r transition-all duration-200 hover:text-secondary"
 								onClick={handleSub}
 							>
 								-
@@ -279,7 +308,7 @@ function MenuItem(props: MenuItemProps) {
 								{count}
 							</div>
 							<button
-								className="btn relative aspect-square h-full animate-slideIn-l"
+								className="btn relative aspect-square h-full animate-slideIn-l transition-all duration-200 hover:text-secondary"
 								onClick={handleAdd}
 							>
 								+
