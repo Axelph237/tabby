@@ -116,24 +116,27 @@ export default function CheckoutPage({
 				</div>
 
 				{/* signature */}
-				<div
-					id="checkout-signature"
-					className="flex w-3/4 cursor-pointer flex-col overflow-hidden rounded-xl bg-accent px-6 py-2 text-primary"
-					onClick={handleFocus}
-				>
-					<p className="font-redacted-script text-6xl text-nowrap">
-						{name == "" ? "Your Name" : name}
-					</p>
-					<input
-						type="text"
-						className="w-full outline-none"
-						ref={inputRef}
-						placeholder="Your Name"
-						onInput={handleNameInput}
-					/>
+				<div className="flex w-3/4 flex-col gap-1">
+					<label className="text-[20px] font-medium">Signature</label>
+					<div
+						id="checkout-signature"
+						className="flex cursor-pointer flex-col overflow-hidden rounded-xl bg-accent px-6 py-2 text-primary"
+						onClick={handleFocus}
+					>
+						<p className="font-redacted-script text-6xl text-nowrap">
+							{name == "" ? "Your Name" : name}
+						</p>
+						<input
+							type="text"
+							className="w-full outline-none"
+							ref={inputRef}
+							placeholder="Your Name"
+							onInput={handleNameInput}
+						/>
+					</div>
 				</div>
 
-				<div className="flex w-full flex-row justify-end">
+				<div className="mb-[20px] flex w-full flex-row justify-end">
 					<button
 						className="btn px-8 py-4 text-primary"
 						onClick={handleSubmit}
