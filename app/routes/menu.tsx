@@ -2,13 +2,49 @@ import "../../public/styles/menu.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
 import ItemType, { type Item } from "~/lib/item";
-import { getTestTypes, tItemTypes } from "~/lib/testTypes";
+import { getTestTypes } from "~/lib/testTypes";
 import { Link } from "react-router";
 
 export default function MenuPage({ params }: { params: { menuId: string } }) {
+	const [menuItemTypes, setMenuItemTypes] = useState<
+		Map<string, { type: ItemType; children: Item[] }> | undefined
+	>(undefined);
 	const [itemCount, setItemCount] = useState(0);
 
 	useEffect(() => {
+		// Get item types
+		const itemTypes = getTestTypes(6); // TODO link to DB retrieval
+		const cartMap: Map<string, { type: ItemType; children: Item[] }> =
+			new Map();
+		for (let i = 0; i < itemTypes.length; i++) {
+			cartMap.set(itemTypes[i].id, {
+				type: itemTypes[i],
+				children: [],
+			});
+		}
+
+		// Set item type data to session storage data
+		const menuId = params.menuId;
+		const sessionData = sessionStorage.getItem(menuId);
+
+		if (sessionData) {
+			const cartData: Item[] = JSON.parse(sessionData);
+
+			for (let i = 0; i < cartData.length; i++) {
+				const type = cartMap.get(cartData[i].typeId);
+				// Update type info (number of items, add item as type child)
+				if (type) {
+					type.children.push(cartData[i]);
+					cartMap.set(cartData[i].typeId, type);
+				}
+			}
+
+			// Update cart item count
+			setItemCount(cartData.length);
+		}
+
+		setMenuItemTypes(cartMap);
+
 		const handleScroll = () => {
 			const main = document.getElementById("order-page-main");
 			const menuRect = document
@@ -69,11 +105,21 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 	};
 
 	const handleUpdate = (item: Item, count: number) => {
-		setItemCount(itemCount + count);
+		// Update menu data
+		const itemType = menuItemTypes?.get(item.typeId);
+		if (itemType) {
+			itemType.children.push(item);
+			menuItemTypes?.set(item.typeId, itemType);
+			setMenuItemTypes(menuItemTypes);
+			setItemCount(itemCount + count);
+		} else {
+			return;
+		}
 
 		const menuId = params.menuId;
 		const sessionData = sessionStorage.getItem(menuId);
 
+		// Update session data
 		if (sessionData) {
 			const cartData = JSON.parse(sessionData);
 			sessionStorage.setItem(menuId, JSON.stringify([...cartData, item]));
@@ -128,14 +174,18 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 					</div>
 					<div className="z-50 bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]">
 						<ul className="flex flex-col items-center gap-10">
-							{getTestTypes(10).map((item, i) => (
-								<Fragment key={i}>
-									<MenuItem
-										item={item}
-										onUpdate={handleUpdate}
-									/>
-								</Fragment>
-							))}
+							{menuItemTypes &&
+								[...menuItemTypes.entries()].map(
+									([typeId, itemTypeData], i) => (
+										<Fragment key={i}>
+											<MenuItem
+												item={itemTypeData.type}
+												itemChildren={itemTypeData.children}
+												onUpdate={handleUpdate}
+											/>
+										</Fragment>
+									),
+								)}
 						</ul>
 					</div>
 				</div>
@@ -146,12 +196,13 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 
 interface MenuItemProps extends HTMLProps<HTMLDivElement> {
 	item: ItemType;
+	itemChildren: Item[];
 	onUpdate: (item: Item, count: number) => void;
 }
 
 function MenuItem(props: MenuItemProps) {
-	const [count, setCount] = useState(0);
-	const [clicked, setClicked] = useState(false);
+	const [count, setCount] = useState(props.itemChildren.length);
+	const [clicked, setClicked] = useState(props.itemChildren.length > 0);
 
 	const handleAdd = () => {
 		if (!clicked) setClicked(true);
