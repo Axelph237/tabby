@@ -14,21 +14,6 @@ export default function CheckoutPage({
 	const [name, setName] = useState("");
 	const inputRef = useRef(null);
 
-	const getMaxCharacters = (pElem: HTMLElement, sampleText = "W") => {
-		let testSpan = document.createElement("span");
-		testSpan.style.visibility = "hidden"; // Hide it
-		testSpan.style.fontFamily = "Red Hat Mono";
-		testSpan.style.fontSize = "20px";
-		testSpan.innerText = sampleText;
-		document.body.appendChild(testSpan);
-
-		let charWidth = testSpan.offsetWidth; // Get width of one character
-		let maxChars = Math.floor(pElem.clientWidth / charWidth);
-
-		document.body.removeChild(testSpan); // Cleanup
-		return maxChars;
-	};
-
 	useEffect(() => {
 		const menuId = params.menuId;
 		const sessionData = sessionStorage.getItem(menuId);
@@ -46,25 +31,6 @@ export default function CheckoutPage({
 			// No menu data found
 			throw Error(`Failed to find cart data for menuId ${menuId}`);
 		}
-
-		const updateDashes = () => {
-			const pt = document.getElementById("dashes-t");
-			const pb = document.getElementById("dashes-b");
-
-			if (pt && pb) {
-				const maxChars = getMaxCharacters(pt, "-");
-
-				pt!.innerText = "-".repeat(maxChars);
-				pb!.innerText = "-".repeat(maxChars);
-			}
-		};
-
-		updateDashes();
-		window.addEventListener("resize", updateDashes);
-
-		return () => {
-			window.removeEventListener("resize", updateDashes);
-		};
 	}, []);
 
 	const handleNameInput = (e: ChangeEvent<HTMLInputElement>) => {
@@ -102,10 +68,20 @@ export default function CheckoutPage({
 						<span>QTY ITEM</span>
 						<span>PRICE</span>
 					</p>
-					<p
-						id="dashes-t"
-						className="dashes max-w-full overflow-x-hidden text-nowrap"
-					></p>
+					<svg
+						width="100%"
+						height="30"
+					>
+						<line
+							x1="0"
+							y1="15"
+							x2="100%"
+							y2="15"
+							stroke="var(--color-accent)"
+							strokeWidth="1.5"
+							strokeDasharray="10,5"
+						/>
+					</svg>
 
 					<ul className="flex flex-col gap-[10px] font-dongle text-[36px] text-primary">
 						{cartItems &&
@@ -119,10 +95,20 @@ export default function CheckoutPage({
 							))}
 					</ul>
 
-					<p
-						id="dashes-b"
-						className="dashes max-w-full overflow-x-hidden text-nowrap"
-					></p>
+					<svg
+						width="100%"
+						height="30"
+					>
+						<line
+							x1="0"
+							y1="15"
+							x2="100%"
+							y2="15"
+							stroke="var(--color-accent)"
+							strokeWidth="1.5"
+							strokeDasharray="10,5"
+						/>
+					</svg>
 					<p className="flex flex-row justify-between">
 						<span>TOTAL</span>
 						<span>${tTotal.toFixed(2)}</span>
