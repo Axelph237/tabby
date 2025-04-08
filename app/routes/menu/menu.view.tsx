@@ -1,49 +1,42 @@
-import "../../public/styles/menu.css";
+import "../../../public/styles/menu.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
-import ItemType, { type Item } from "~/lib/item";
-import { getTestTypes } from "~/lib/testTypes";
+import { tItemTypes } from "~/lib/+types/testTypes";
 import { Link } from "react-router";
+// import type ItemType from "~/lib/+types/item-type";
+// import Cart, { isCart } from "~/lib/+types/cart";
+// import type Item from "~/lib/+types/item";
+// import type { CartItem } from "~/lib/+types/cart";
+import Cart, { type CartItem } from "~/utils/cart";
+import type { Item } from "~/routes/menu/menu.validation";
+import { getSession } from "~/routes/menu/menu.handler";
 
-export default function MenuPage({ params }: { params: { menuId: string } }) {
-	const [menuItemTypes, setMenuItemTypes] = useState<
-		Map<string, { type: ItemType; children: Item[] }> | undefined
-	>(undefined);
-	const [itemCount, setItemCount] = useState(0);
+export default function MenuPage({ params }: { params: { sessId: string } }) {
+	const [menu, setMenu] = useState<Item[] | undefined>(undefined);
+	const [cart, setCart] = useState<Cart | undefined>(undefined);
 
 	useEffect(() => {
 		// Get item types
-		const itemTypes = getTestTypes(6); // TODO link to DB retrieval
-		const cartMap: Map<string, { type: ItemType; children: Item[] }> =
-			new Map();
-		for (let i = 0; i < itemTypes.length; i++) {
-			cartMap.set(itemTypes[i].id, {
-				type: itemTypes[i],
-				children: [],
-			});
-		}
+		const sessId = params.sessId;
 
-		// Set item type data to session storage data
-		const menuId = params.menuId;
-		const sessionData = sessionStorage.getItem(menuId);
+		getSession(sessId).then((sess) => {
+			setMenu(sess.items);
 
-		if (sessionData) {
-			const cartData: Item[] = JSON.parse(sessionData);
+			const cartData = sessionStorage.getItem(sessId);
+			// Parse empty string if data is null; "" will fail isCart test
+			const parsedData = JSON.parse(cartData ?? "");
 
-			for (let i = 0; i < cartData.length; i++) {
-				const type = cartMap.get(cartData[i].typeId);
-				// Update type info (number of items, add item as type child)
-				if (type) {
-					type.children.push(cartData[i]);
-					cartMap.set(cartData[i].typeId, type);
-				}
+			let newCart: Cart;
+			if (Cart.isCart(parsedData)) {
+				console.log("Cart found! :)");
+				newCart = new Cart(parsedData);
+			} else {
+				console.log("No cart found.");
+				newCart = new Cart();
 			}
 
-			// Update cart item count
-			setItemCount(cartData.length);
-		}
-
-		setMenuItemTypes(cartMap);
+			setCart(newCart);
+		});
 
 		const handleScroll = () => {
 			const main = document.getElementById("order-page-main");
@@ -104,59 +97,18 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 		}
 	};
 
-	const handleUpdate = (item: Item, count: number) => {
-		// Update menu data
-		const itemType = menuItemTypes?.get(item.typeId);
-		if (itemType) {
-			if (count > 0) {
-				for (let i = 0; i < count; i++) itemType.children.push(item);
-			} else {
-				// Remove all items of same type
-				// TODO FAR improve the time complexity of this code (current N^2 for simple operation)
-				// TODO Likely needs rewrite of whole session data system to instead track selectKey types in the storage itself
-				for (let i = 0; i < -1 * count; i++) {
-					const index = itemType.children.findIndex(
-						(it) =>
-							it.typeId === item.typeId && item.selectKey === it.selectKey,
-					);
-					// Remove item if found
-					if (index >= 0) {
-						itemType.children.splice(index, 1);
-					}
-				}
-			}
-			menuItemTypes?.set(item.typeId, itemType);
-			setMenuItemTypes(menuItemTypes);
-			setItemCount(itemCount + count);
+	const handleUpdate = (item: CartItem) => {
+		if (!cart || !menu) return;
+
+		if (item.count > 0) {
+			cart.addItem(item);
+			console.log("Item added to cart.", cart.toObject());
 		} else {
-			return;
+			cart.removeItem(item);
+			console.log("Item removed from cart.", cart.toObject());
 		}
 
-		const menuId = params.menuId;
-		const sessionData = sessionStorage.getItem(menuId);
-
-		// Update session data
-		if (sessionData) {
-			const cartData: Item[] = JSON.parse(sessionData);
-
-			if (count > 0) {
-				for (let i = 0; i < count; i++) cartData.push(item);
-			} else {
-				for (let i = 0; i < -1 * count; i++) {
-					// Remove each item from the cart data
-					const index = cartData.findIndex(
-						(it) =>
-							it.typeId === item.typeId && it.selectKey === item.selectKey,
-					);
-					cartData.splice(index, 1);
-				}
-			}
-			sessionStorage.setItem(menuId, JSON.stringify(cartData));
-		} else {
-			sessionStorage.setItem(menuId, JSON.stringify([item]));
-		}
-
-		createPebbleEffect(itemCount + count > itemCount);
+		createPebbleEffect(item.count > 0);
 	};
 
 	return (
@@ -167,14 +119,14 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 			<div className="fixed h-1/2 w-full lg:h-1/2">
 				<img
 					id="order-page-img"
-					src="../../public/test-menu-img.jpg"
+					src="../../../public/test-menu-img.jpg"
 					alt="restaurant"
 					className="h-full w-full object-cover"
 				/>
 			</div>
 
 			<Link
-				to={`/checkout/${params.menuId}`}
+				to={`/checkout/${params.sessId}`}
 				id="checkout-btn-container"
 				className="gooey fixed bottom-10 left-10 z-[9999]"
 				viewTransition
@@ -185,7 +137,9 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 				>
 					<ReceiptIcon className="icon-sm" />
 					<span className="hidden md:block">Checkout</span>
-					<span className={`${itemCount <= 0 && "hidden"}`}>({itemCount})</span>
+					<span className={`${cart && cart.items.length <= 0 && "hidden"}`}>
+						({cart?.items.length})
+					</span>
 				</button>
 			</Link>
 
@@ -204,18 +158,16 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 					</div>
 					<div className="z-50 bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]">
 						<ul className="flex flex-col items-center gap-10">
-							{menuItemTypes &&
-								[...menuItemTypes.entries()].map(
-									([typeId, itemTypeData], i) => (
-										<Fragment key={i}>
-											<MenuItem
-												item={itemTypeData.type}
-												itemchildren={itemTypeData.children}
-												onUpdate={handleUpdate}
-											/>
-										</Fragment>
-									),
-								)}
+							{menu &&
+								menu.map((item, i) => (
+									<Fragment key={i}>
+										<MenuItem
+											item={item}
+											itemChildren={cart?.findItemFamily(item.id) ?? []}
+											onUpdate={handleUpdate}
+										/>
+									</Fragment>
+								))}
 						</ul>
 					</div>
 				</div>
@@ -225,14 +177,23 @@ export default function MenuPage({ params }: { params: { menuId: string } }) {
 }
 
 interface MenuItemProps extends HTMLProps<HTMLDivElement> {
-	item: ItemType;
-	itemchildren: Item[];
-	onUpdate: (item: Item, count: number) => void;
+	item: Item;
+	itemChildren: CartItem[];
+	onUpdate: (item: CartItem) => void;
 }
 
 function MenuItem(props: MenuItemProps) {
-	const [count, setCount] = useState(props.itemchildren.length);
-	const [clicked, setClicked] = useState(props.itemchildren.length > 0);
+	const [count, setCount] = useState(props.itemChildren.length);
+	const [clicked, setClicked] = useState(props.itemChildren.length > 0);
+
+	const [opened, setOpened] = useState(false);
+	const [options, setOptions] = useState(undefined);
+
+	useEffect(() => {
+		if (opened && !options) {
+			// On first open get option data for item.
+		}
+	}, [opened]);
 
 	const handleAdd = () => {
 		if (!clicked) setClicked(true);
@@ -240,7 +201,17 @@ function MenuItem(props: MenuItemProps) {
 		setCount(count + 1);
 
 		// Call parent function
-		props.onUpdate(props.item.createItem([]), 1);
+		props.onUpdate({
+			// Inherited props
+			id: props.item.id,
+			name: props.item.name,
+			description: props.item.description,
+			img_url: props.item.img_url,
+			// New props
+			unit_price: props.item.base_price,
+			count: 1,
+			selections: [],
+		});
 	};
 
 	const handleSub = () => {
@@ -249,7 +220,17 @@ function MenuItem(props: MenuItemProps) {
 		setCount(count - 1);
 
 		// Call parent function
-		props.onUpdate(props.item.createItem([]), -1);
+		props.onUpdate({
+			// Inherited props
+			id: props.item.id,
+			name: props.item.name,
+			description: props.item.description,
+			img_url: props.item.img_url,
+			// New props
+			unit_price: props.item.base_price,
+			count: -1,
+			selections: [],
+		});
 	};
 
 	return (
@@ -278,10 +259,10 @@ function MenuItem(props: MenuItemProps) {
 
 				{/* Img */}
 				<div className="flex h-[130px] w-1/3 items-center justify-center overflow-hidden rounded-xl object-cover">
-					{props.item.imgUrl && (
+					{props.item.img_url && (
 						<img
 							className="h-full w-full object-cover"
-							src={props.item.imgUrl}
+							src={props.item.img_url}
 							alt={props.item.name}
 						/>
 					)}
