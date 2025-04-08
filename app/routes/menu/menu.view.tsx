@@ -1,4 +1,4 @@
-import "/styles/menu.css?url";
+import "/public/styles/menu.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
 import { tItemTypes } from "~/lib/+types/testTypes";
@@ -25,7 +25,7 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 
 				const cartData = sessionStorage.getItem(sessId);
 				// Parse empty string if data is null; "" will fail isCart test
-				const parsedData = JSON.parse(cartData ?? "");
+				const parsedData = JSON.parse(cartData ?? "{}");
 
 				let newCart: Cart;
 				if (Cart.isCart(parsedData)) {
@@ -38,7 +38,7 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 
 				setCart(newCart);
 			})
-			.catch((err) => console.log(err));
+			.catch((err) => console.warn(err));
 
 		const handleScroll = () => {
 			const main = document.getElementById("order-page-main");
@@ -71,6 +71,7 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 	}, []);
 
 	const createPebbleEffect = (dropIn: boolean) => {
+		console.log("Pebbling");
 		const parent = document.getElementById("checkout-btn-container");
 		if (parent) {
 			const parentRect = parent.getBoundingClientRect();
@@ -100,6 +101,7 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 	};
 
 	const handleUpdate = (item: CartItem) => {
+		console.log("updating", cart, menu);
 		if (!cart || !menu) return;
 
 		if (item.count > 0) {

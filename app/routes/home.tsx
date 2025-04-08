@@ -1,6 +1,6 @@
 import { type Route } from "../../.react-router/types/app/+types/root";
-import logoDark from "../../public/react-router/logo-dark.svg";
-import logoLight from "../../public/react-router/logo-light.svg";
+// import logoDark from "../../public/react-router/logo-dark.svg";
+// import logoLight from "../../public/react-router/logo-light.svg";
 import { PlayIcon, TabbyLogo } from "~/components/icons";
 
 export function meta({}: Route.MetaArgs) {
