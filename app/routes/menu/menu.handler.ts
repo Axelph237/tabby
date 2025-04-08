@@ -3,8 +3,11 @@ import { type UUID, uuidObj } from "~/utils/types/uuid";
 import type { SessionDetails } from "~/routes/menu/menu.validation";
 import type { FailedRequest } from "~/utils/types/failedRequest";
 
+const domain = import.meta.env.VITE_API_DOMAIN || "http://localhost:3000";
+
 export async function getSession(id: UUID): Promise<SessionDetails> {
-	const url = `/sessions/${id}`;
+	const url = `${domain}/sessions/${id}`;
+	console.log("Getting url");
 
 	const response = await fetch(url, { method: "GET" });
 	const body = await response.json();

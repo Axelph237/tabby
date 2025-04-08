@@ -1,4 +1,4 @@
-import "../../../public/styles/menu.css";
+import "/styles/menu.css?url";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
 import { tItemTypes } from "~/lib/+types/testTypes";
@@ -19,24 +19,26 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 		// Get item types
 		const sessId = params.sessId;
 
-		getSession(sessId).then((sess) => {
-			setMenu(sess.items);
+		getSession(sessId)
+			.then((sess) => {
+				setMenu(sess.items);
 
-			const cartData = sessionStorage.getItem(sessId);
-			// Parse empty string if data is null; "" will fail isCart test
-			const parsedData = JSON.parse(cartData ?? "");
+				const cartData = sessionStorage.getItem(sessId);
+				// Parse empty string if data is null; "" will fail isCart test
+				const parsedData = JSON.parse(cartData ?? "");
 
-			let newCart: Cart;
-			if (Cart.isCart(parsedData)) {
-				console.log("Cart found! :)");
-				newCart = new Cart(parsedData);
-			} else {
-				console.log("No cart found.");
-				newCart = new Cart();
-			}
+				let newCart: Cart;
+				if (Cart.isCart(parsedData)) {
+					console.log("Cart found! :)");
+					newCart = new Cart(parsedData);
+				} else {
+					console.log("No cart found.");
+					newCart = new Cart();
+				}
 
-			setCart(newCart);
-		});
+				setCart(newCart);
+			})
+			.catch((err) => console.log(err));
 
 		const handleScroll = () => {
 			const main = document.getElementById("order-page-main");
@@ -119,7 +121,7 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 			<div className="fixed h-1/2 w-full lg:h-1/2">
 				<img
 					id="order-page-img"
-					src="../../../public/test-menu-img.jpg"
+					src="/test-menu-img.jpg"
 					alt="restaurant"
 					className="h-full w-full object-cover"
 				/>
