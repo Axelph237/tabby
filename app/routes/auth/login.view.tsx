@@ -1,6 +1,6 @@
 const loginUrl = "http://localhost:3000/auth/google";
 
-export default function LoginPage() {
+export default function LoginLoginPage() {
 	return (
 		<div>
 			<a

@@ -1,7 +1,5 @@
-import { Value } from "@sinclair/typebox/value";
-import { type UUID, uuidObj } from "~/utils/types/uuid";
+import { type UUID } from "~/utils/types/uuid";
 import type { SessionDetails } from "~/routes/menu/menu.validation";
-import type { FailedRequest } from "~/utils/types/failedRequest";
 
 const domain = import.meta.env.VITE_API_DOMAIN || "http://localhost:3000";
 
