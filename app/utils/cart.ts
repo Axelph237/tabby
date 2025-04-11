@@ -24,11 +24,21 @@ export type CartData = Static<typeof cartDataObj>;
  */
 export default class Cart {
 	readonly items: CartItem[];
-	totalCost: number = 0;
+	totalCost: number;
+	numLineItems: number;
 
 	constructor(cart?: CartData) {
-		this.items = cart?.items ?? [];
-		this.totalCost = cart?.totalCost ?? 0;
+		if (cart?.items) {
+			this.items = cart.items;
+			this.totalCost = cart.totalCost;
+
+			this.numLineItems = 0;
+			for (const item of cart?.items) this.numLineItems += item.count;
+		} else {
+			this.items = [];
+			this.totalCost = 0;
+			this.numLineItems = 0;
+		}
 	}
 
 	/**
@@ -85,6 +95,7 @@ export default class Cart {
 		else this.items.push(item);
 
 		this.totalCost += item.count * item.unit_price;
+		this.numLineItems += item.count;
 	};
 
 	/**
@@ -95,15 +106,14 @@ export default class Cart {
 		const index = this.findItem(item);
 		if (index < 0) return;
 
-		if (this.items[index].count - item.count > 0) {
-			// Decrement item
-			this.totalCost -= item.count * item.unit_price;
-			this.items[index].count -= item.count;
-		} else {
+		const numRemoved = Math.min(item.count, this.items[index].count);
+		if (numRemoved == this.items[index].count)
 			// Remove item
-			this.totalCost -= this.items[index].count * item.unit_price;
-			this.items.splice(index, 1);
-		}
+			this.items.splice(index, 1); // Decrement item
+		else this.items[index].count -= item.count;
+
+		this.totalCost -= numRemoved * item.unit_price;
+		this.numLineItems -= numRemoved;
 	};
 
 	/**

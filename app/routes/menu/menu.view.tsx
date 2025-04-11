@@ -14,6 +14,7 @@ import { getSession } from "~/routes/menu/menu.handler";
 export default function MenuPage({ params }: { params: { sessId: string } }) {
 	const [menu, setMenu] = useState<Item[] | undefined>(undefined);
 	const [cart, setCart] = useState<Cart | undefined>(undefined);
+	const [numLineItems, setNumLineItems] = useState<number>(0);
 
 	useEffect(() => {
 		// Get item types
@@ -71,7 +72,6 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 	}, []);
 
 	const createPebbleEffect = (dropIn: boolean) => {
-		console.log("Pebbling");
 		const parent = document.getElementById("checkout-btn-container");
 		if (parent) {
 			const parentRect = parent.getBoundingClientRect();
@@ -101,7 +101,6 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 	};
 
 	const handleUpdate = (item: CartItem) => {
-		console.log("updating", cart, menu);
 		if (!cart || !menu) return;
 
 		if (item.count > 0) {
@@ -112,6 +111,7 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 			console.log("Item removed from cart.", cart.toObject());
 		}
 
+		setNumLineItems(cart.numLineItems);
 		createPebbleEffect(item.count > 0);
 	};
 
@@ -141,8 +141,8 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 				>
 					<ReceiptIcon className="icon-sm" />
 					<span className="hidden md:block">Checkout</span>
-					<span className={`${cart && cart.items.length <= 0 && "hidden"}`}>
-						({cart?.items.length})
+					<span className={`${numLineItems <= 0 && "hidden"}`}>
+						({numLineItems})
 					</span>
 				</button>
 			</Link>
