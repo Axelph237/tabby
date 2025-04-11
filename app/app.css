@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+/* Custom design tokens */
+:root {
+	--mask-corner-cutout-br: url("../public/br-corner16.svg") 0 0/100% 100%;
+	--mask-corner-cutout-bl: url("../public/bl-corner16.svg") 0 0/100% 100%;
+	--mask-corner-cutout-tr: url("../public/tr-corner16.svg") 0 0/100% 100%;
+	--mask-corner-cutout-tl: url("../public/tl-corner16.svg") 0 0/100% 100%;
+
+	--border-radius-formal: 8px;
+	--border-radius-playful: 16px;
+}
+
+/* Tailwind design tokens */
 @theme {
 	--font-sans:
 		"Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
@@ -147,22 +159,22 @@ body {
 }
 
 /* Rounded corners (16px only) */
-.br-corner {
-	mask-image: url("public/br-corner16.svg");
-	mask-position: 0 0;
-}
-.bl-corner {
-	mask-image: url("public/bl-corner16.svg");
-	mask-size: 100%;
-}
-.tl-corner {
-	mask-image: url("public/tl-corner16.svg");
-	mask-size: 100%;
-}
-.tr-corner {
-	mask-image: url("public/tr-corner16.svg");
-	mask-size: 100%;
-}
+/*.br-corner {*/
+/*	mask-image: url("public/br-corner16.svg");*/
+/*	mask-position: 0 0;*/
+/*}*/
+/*.bl-corner {*/
+/*	mask-image: url("public/bl-corner16.svg");*/
+/*	mask-size: 100%;*/
+/*}*/
+/*.tl-corner {*/
+/*	mask-image: url("public/tl-corner16.svg");*/
+/*	mask-size: 100%;*/
+/*}*/
+/*.tr-corner {*/
+/*	mask-image: url("public/tr-corner16.svg");*/
+/*	mask-size: 100%;*/
+/*}*/
 
 /* Svgfilters */
 .content-aware-shadow {

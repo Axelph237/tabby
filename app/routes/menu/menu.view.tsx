@@ -151,16 +151,27 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 				{/* Menu */}
 				<div
 					id="menu-container"
-					className="gooey relative flex max-h-2/3 flex-col"
+					className="relative flex max-h-2/3 flex-col"
 				>
-					<div className="flex flex-row items-end justify-end">
-						<div className="relative right-0 h-[85px] w-1/2 bg-primary">
+					{/* Menu Header */}
+					<div
+						id="menu-header-container"
+						className="flex flex-row items-end justify-end"
+					>
+						<div
+							id="menu-header"
+							className="relative right-0 h-[85px] w-1/2 bg-primary"
+						>
 							<h1 className="flex items-center justify-center font-dongle text-[64px] font-semibold text-accent">
 								Menu
 							</h1>
 						</div>
 					</div>
-					<div className="z-50 bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]">
+					{/* Menu Body */}
+					<div
+						id="menu-body"
+						className="z-50 bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]"
+					>
 						<ul className="flex flex-col items-center gap-10">
 							{menu &&
 								menu.map((item, i) => (
@@ -239,68 +250,58 @@ function MenuItem(props: MenuItemProps) {
 
 	return (
 		<div
-			className="relative flex w-full justify-center"
+			className="item-container relative flex w-full flex-row"
 			{...props}
 		>
-			{/* shape */}
-			<div className="content-aware-shadow gooey absolute flex w-full flex-row">
-				{/* shape - body */}
-				<div className="h-[200px] w-2/3 bg-secondary"></div>
-				{/* shape - info */}
-				<div className="h-[150px] w-1/3 bg-secondary"></div>
+			{/* Info Body */}
+			<div className="item-body h-[200px] w-2/3 bg-secondary p-[10px]">
+				<h2 className="font-dongle text-3xl sm:text-4xl lg:text-5xl">
+					{props.item.name}
+				</h2>
+				<p className="opacity-60 sm:text-lg lg:text-xl">
+					{props.item.description}
+				</p>
 			</div>
-			{/* Sections */}
-			<div className="relative flex h-[200px] w-full flex-row gap-[10px] p-[10px]">
-				{/* Body */}
-				<div className="flex h-full w-2/3 flex-col">
-					<h2 className="font-dongle text-3xl sm:text-4xl lg:text-5xl">
-						{props.item.name}
-					</h2>
-					<p className="opacity-60 sm:text-lg lg:text-xl">
-						{props.item.description}
-					</p>
-				</div>
 
-				{/* Img */}
-				<div className="flex h-[130px] w-1/3 items-center justify-center overflow-hidden rounded-xl object-cover">
-					{props.item.img_url && (
-						<img
-							className="h-full w-full object-cover"
-							src={props.item.img_url}
-							alt={props.item.name}
-						/>
-					)}
-				</div>
+			{/* Img */}
+			<div className="item-img-container relative flex h-[150px] w-1/3 items-center justify-center bg-secondary p-[10px]">
+				{props.item.img_url && (
+					<img
+						className="item-img h-full w-full rounded-xl object-cover"
+						src={props.item.img_url}
+						alt={props.item.name}
+					/>
+				)}
+			</div>
 
-				{/* Buttons */}
-				<div className="absolute right-0 bottom-0 flex h-[50px] w-1/3 items-center justify-center justify-evenly p-[5px] md:justify-center md:gap-[20px]">
-					{!clicked ? (
+			{/* Buttons */}
+			<div className="absolute right-0 bottom-0 flex h-[50px] w-1/3 items-center justify-center justify-evenly p-[5px] md:justify-center md:gap-[20px]">
+				{!clicked ? (
+					<button
+						className="btn size-full"
+						onClick={handleAdd}
+					>
+						Add
+					</button>
+				) : (
+					<>
 						<button
-							className="btn size-full"
+							className="btn relative aspect-square h-full animate-slideIn-r transition-all duration-200 hover:text-secondary"
+							onClick={handleSub}
+						>
+							-
+						</button>
+						<div className="item-count-input flex h-full w-[50px] items-center justify-center rounded-xl bg-accent font-red-hat-text font-bold">
+							{count}
+						</div>
+						<button
+							className="btn relative aspect-square h-full animate-slideIn-l transition-all duration-200 hover:text-secondary"
 							onClick={handleAdd}
 						>
-							Add
+							+
 						</button>
-					) : (
-						<>
-							<button
-								className="btn relative aspect-square h-full animate-slideIn-r transition-all duration-200 hover:text-secondary"
-								onClick={handleSub}
-							>
-								-
-							</button>
-							<div className="item-count-input flex h-full w-[50px] items-center justify-center rounded-xl bg-accent font-red-hat-text font-bold">
-								{count}
-							</div>
-							<button
-								className="btn relative aspect-square h-full animate-slideIn-l transition-all duration-200 hover:text-secondary"
-								onClick={handleAdd}
-							>
-								+
-							</button>
-						</>
-					)}
-				</div>
+					</>
+				)}
 			</div>
 		</div>
 	);

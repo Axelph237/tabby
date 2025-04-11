@@ -1,5 +1,54 @@
 @import "../../node_modules/tailwindcss";
 
+#order-page-img {
+	mask-image: linear-gradient(black 40%, transparent);
+}
+
+/* menu header corner cutout */
+#menu-container {
+	--corner-size: var(--border-radius-playful);
+}
+#menu-header {
+	border-radius: var(--corner-size) var(--corner-size) 0 0;
+}
+#menu-header::after {
+	--size: calc(2 * var(--corner-size));
+	position: absolute;
+	width: var(--size);
+	height: var(--size);
+	left: calc(-1 * var(--size));
+	bottom: 0;
+
+	mask: var(--mask-corner-cutout-tl);
+	background: var(--color-primary);
+
+	content: "";
+}
+#menu-body {
+	border-radius: var(--corner-size) 0 var(--corner-size) var(--corner-size);
+}
+
+.item-body {
+	border-radius: var(--corner-size) 0 var(--corner-size) var(--corner-size);
+}
+.item-img-container {
+	border-radius: 0 var(--corner-size) var(--corner-size) 0;
+}
+.item-img-container::after {
+	--size: var(--corner-size);
+	position: absolute;
+	width: var(--size);
+	height: var(--size);
+	left: 0;
+	bottom: calc(-1 * var(--size));
+
+	mask: var(--mask-corner-cutout-br);
+	background: var(--color-secondary);
+
+	content: "";
+	z-index: 1000;
+}
+
 /* Hide scrollbar but allow scrolling */
 .no-scroll {
 	-ms-overflow-style: none; /* For Internet Explorer and Edge */
@@ -9,10 +58,6 @@
 
 .no-scroll::-webkit-scrollbar {
 	display: none; /* For Chrome, Safari, and Opera */
-}
-
-#order-page-img {
-	mask-image: linear-gradient(black 40%, transparent);
 }
 
 /* Style for the number input */
