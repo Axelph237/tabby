@@ -1,7 +1,15 @@
 import { TabbyLogo } from "~/components/icons";
-import { type ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
-import { isItem, type Item } from "~/lib/item";
+import {
+	type ChangeEvent,
+	type FormEvent,
+	Fragment,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
+// import { isItem, type Item } from "~/lib/item";
 import { Router } from "react-router";
+import type { Item } from "~/routes/menu/menu.validation";
 
 const tTotal = 10.56;
 
@@ -10,31 +18,32 @@ export default function CheckoutPage({
 }: {
 	params: { menuId: string };
 }) {
-	const [cartItems, setCartItems] = useState<undefined | Item[]>(undefined);
+	const [cartItems, setCartItems] = useState<undefined>(undefined);
 	const [name, setName] = useState("");
 	const inputRef = useRef(null);
 
-	useEffect(() => {
-		const menuId = params.menuId;
-		const sessionData = sessionStorage.getItem(menuId);
-
-		if (sessionData) {
-			const cartData: Item[] = JSON.parse(sessionData);
-
-			const items = [];
-			for (let i = 0; i < cartData.length; i++) {
-				if (isItem(cartData[i])) items.push(cartData[i]);
-			}
-
-			setCartItems(items);
-		} else {
-			// No menu data found
-			throw Error(`Failed to find cart data for menuId ${menuId}`);
-		}
-	}, []);
+	// useEffect(() => {
+	// 	const menuId = params.menuId;
+	// 	const sessionData = sessionStorage.getItem(menuId);
+	//
+	// 	if (sessionData) {
+	// 		const cartData: Item[] = JSON.parse(sessionData);
+	//
+	// 		const items = [];
+	// 		for (let i = 0; i < cartData.length; i++) {
+	// 			if (isItem(cartData[i])) items.push(cartData[i]);
+	// 		}
+	//
+	// 		setCartItems(items);
+	// 	} else {
+	// 		// No menu data found
+	// 		throw Error(`Failed to find cart data for menuId ${menuId}`);
+	// 	}
+	// }, []);
 
 	const handleNameInput = (e: ChangeEvent<HTMLInputElement>) => {
-		setName(e.target.value);
+		const text = (inputRef.current! as HTMLInputElement).value;
+		setName(text);
 	};
 
 	const handleFocus = () => {
@@ -84,15 +93,15 @@ export default function CheckoutPage({
 					</svg>
 
 					<ul className="flex flex-col gap-[10px] font-dongle text-[36px] text-primary">
-						{cartItems &&
-							cartItems.map((item, i) => (
-								<Fragment key={i}>
-									<CheckoutItem
-										item={item}
-										count={i + 1}
-									/>
-								</Fragment>
-							))}
+						{/*{cartItems &&*/}
+						{/*	cartItems.map((item, i) => (*/}
+						{/*		<Fragment key={i}>*/}
+						{/*			<CheckoutItem*/}
+						{/*				item={item}*/}
+						{/*				count={i + 1}*/}
+						{/*			/>*/}
+						{/*		</Fragment>*/}
+						{/*	))}*/}
 					</ul>
 
 					<svg
@@ -124,14 +133,14 @@ export default function CheckoutPage({
 						onClick={handleFocus}
 					>
 						<p className="font-redacted-script text-6xl text-nowrap">
-							{name == "" ? "Your Name" : name}
+							{name === "" ? "Your Name" : name}
 						</p>
 						<input
 							type="text"
 							className="w-full outline-none"
 							ref={inputRef}
 							placeholder="Your Name"
-							onInput={handleNameInput}
+							onChange={handleNameInput}
 						/>
 					</div>
 				</div>
@@ -152,11 +161,13 @@ export default function CheckoutPage({
 function CheckoutItem({ item, count }: { item: Item; count: number }) {
 	return (
 		<div className="layered h-[64px] w-full items-center justify-center overflow-hidden rounded-2xl bg-secondary">
-			<img
-				src={item.imgUrl}
-				alt={item.name}
-				className="top-0 left-0 aspect-auto w-[120%] object-cover opacity-35 blur-lg"
-			/>
+			{item.img_url && (
+				<img
+					src={item.img_url}
+					alt={item.name}
+					className="top-0 left-0 aspect-auto w-[120%] object-cover opacity-35 blur-lg"
+				/>
+			)}
 			<p className="mx-6">
 				{count} {item.name}
 			</p>
