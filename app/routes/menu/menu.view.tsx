@@ -1,4 +1,4 @@
-import "/public/styles/menu.css";
+import "/app/routes/menu/menu.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
 import { tItemTypes } from "~/lib/+types/testTypes";

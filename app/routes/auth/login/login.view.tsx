@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useEffect } from "react";
+import { Fragment, type ReactNode, useEffect, useState } from "react";
 import { GoogleLogoIcon, LockIcon, UserIcon } from "~/components/icons";
 import "./login.css";
 import { getMe } from "~/api/user.handler";
@@ -12,21 +12,6 @@ const providers = [
 ];
 
 export default function LoginPage() {
-	useEffect(() => {
-		const verifyLogin = (msg: MessageEvent<any>) => {
-			if (msg.data != "tabby.oauth_login.done") return;
-
-			getMe()
-				.then((data) => console.log(data.email))
-				.catch((err) => console.log(err));
-		};
-
-		window.addEventListener("message", verifyLogin);
-		return () => {
-			window.removeEventListener("message", verifyLogin);
-		};
-	}, []);
-
 	const openPopup = (url: string) => {
 		window.open(
 			url,

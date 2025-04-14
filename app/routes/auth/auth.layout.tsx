@@ -1,8 +1,37 @@
-import "/public/styles/menu.css";
+import "/app/routes/menu/menu.css";
 import { Outlet } from "react-router";
 import { TabbyLogo } from "~/components/icons";
+import { useEffect, useRef, useState } from "react";
+import { getMe } from "~/api/user.handler";
+import "./auth.css";
+import checkmarkLottie from "../../../public/lotties/checkmark.json";
+import Lottie from "react-lottie-player";
+import type { LottiePlayer } from "lottie-web";
 
 export default function AuthPage() {
+	const [loggedIn, setLoggedIn] = useState<boolean>(false);
+	const lottieRef = useRef(null);
+
+	useEffect(() => {
+		const verifyLogin = (msg: MessageEvent<any>) => {
+			if (msg.data != "tabby.oauth_login.done") return;
+
+			getMe()
+				.then((data) => {
+					setLoggedIn(true);
+					setTimeout(() => {
+						(lottieRef.current! as LottiePlayer).play();
+					}, 200);
+				})
+				.catch((err) => console.log(err));
+		};
+
+		window.addEventListener("message", verifyLogin);
+		return () => {
+			window.removeEventListener("message", verifyLogin);
+		};
+	}, []);
+
 	return (
 		<main
 			id="order-page-main"
@@ -17,20 +46,30 @@ export default function AuthPage() {
 			</div>
 			{/* Menu */}
 			<div
-				id="menu-container"
-				className="gooey relative top-[30px] flex h-full flex-col"
+				id="auth-container"
+				className={`${loggedIn && "slide-auth-body-out"} relative top-[30px] flex h-full flex-col`}
 			>
 				<div className="flex flex-row items-end justify-end">
-					<div className="relative right-0 w-1/2 bg-primary">
+					<div className="auth-header relative right-0 w-1/2 bg-primary">
 						<h1 className="flex items-center justify-center font-dongle text-[64px] font-semibold text-accent">
 							Login
 						</h1>
 					</div>
 				</div>
-				<div className="z-50 flex h-full flex-col items-center justify-start bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]">
+				<div className="auth-body z-50 flex h-full flex-col items-center justify-start bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]">
 					{/*	Input */}
 					<Outlet />
 				</div>
+			</div>
+			<div
+				className={`${!loggedIn && "hidden"} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2`}
+			>
+				<Lottie
+					ref={lottieRef}
+					loop={false}
+					animationData={checkmarkLottie}
+					className="h-full w-full"
+				/>
 			</div>
 		</main>
 	);

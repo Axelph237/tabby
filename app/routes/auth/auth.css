@@ -1,0 +1,34 @@
+#auth-container {
+	--corner-size: var(--border-radius-playful);
+}
+.auth-header {
+	border-radius: var(--corner-size) var(--corner-size) 0 0;
+}
+.auth-header::after {
+	--size: calc(2 * var(--corner-size));
+	position: absolute;
+	width: var(--size);
+	height: var(--size);
+	left: calc(-1 * var(--size));
+	bottom: 0;
+
+	mask: var(--mask-corner-cutout-tl);
+	background: var(--color-primary);
+
+	content: "";
+}
+.auth-body {
+	border-radius: var(--corner-size) 0 var(--corner-size) var(--corner-size);
+}
+
+.slide-auth-body-out {
+	animation: slide-out 400ms 200ms ease-in forwards;
+}
+@keyframes slide-out {
+	from {
+		top: 0;
+	}
+	to {
+		top: 100vh;
+	}
+}
