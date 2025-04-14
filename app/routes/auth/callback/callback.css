@@ -1,0 +1,11 @@
+.slide-out {
+	animation: slide-out 500ms linear forwards;
+}
+@keyframes slide-out {
+	from {
+		top: 0;
+	}
+	to {
+		top: -100%;
+	}
+}

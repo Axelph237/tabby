@@ -1,3 +1,11 @@
+import { useEffect } from "react";
+import Cookies from "cookie";
+
 export default function LoginCallbackPage() {
-	return <p>Logged In</p>;
+	useEffect(() => {
+		window.opener.postMessage("tabby.oauth_login.done");
+		window.close();
+	}, []);
+
+	return <p>Redirecting</p>;
 }

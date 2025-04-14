@@ -5,6 +5,8 @@ import {
 	SendIcon,
 	TabbyLogo,
 } from "~/components/icons";
+import Lottie from "react-lottie-player";
+import checkmarkLottie from "public/lotties/checkmark.json";
 
 export default function QueuePage() {
 	return (
@@ -27,8 +29,13 @@ export default function QueuePage() {
 						Your Order Is Ready
 					</h1>
 
-					<div className="flex aspect-square w-1/2 max-w-[300px] items-center justify-center rounded-full border-3 border-primary shadow-xl">
-						<CheckIcon className="aspect-square w-full" />
+					<div className="flex aspect-square w-1/2 max-w-[300px] items-center justify-center">
+						<Lottie
+							loop={false}
+							animationData={checkmarkLottie}
+							play
+							style={{ width: "100%", height: "100%" }}
+						/>
 					</div>
 
 					<div>

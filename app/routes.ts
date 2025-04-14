@@ -4,7 +4,7 @@ export default [
 	index("routes/home.tsx"),
 	// Login page
 	route("/auth", "routes/auth/auth.view.tsx", [
-		index("routes/auth/login.view.tsx"),
+		index("routes/auth/login/login.view.tsx"),
 		route("callback", "routes/auth/callback/callback.view.tsx"),
 	]),
 	route("/menu/:sessId", "routes/menu/menu.view.tsx"),

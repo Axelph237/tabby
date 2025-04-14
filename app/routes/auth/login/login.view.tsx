@@ -1,6 +1,7 @@
-import { Fragment, type ReactNode } from "react";
+import { Fragment, type ReactNode, useEffect } from "react";
 import { GoogleLogoIcon, LockIcon, UserIcon } from "~/components/icons";
 import "./login.css";
+import { getMe } from "~/api/user.handler";
 
 const providers = [
 	{
@@ -10,7 +11,36 @@ const providers = [
 	},
 ];
 
-export default function LoginLoginPage() {
+export default function LoginPage() {
+	useEffect(() => {
+		const verifyLogin = (msg: MessageEvent<any>) => {
+			if (msg.data != "tabby.oauth_login.done") return;
+
+			getMe()
+				.then((data) => console.log(data.email))
+				.catch((err) => console.log(err));
+		};
+
+		window.addEventListener("message", verifyLogin);
+		return () => {
+			window.removeEventListener("message", verifyLogin);
+		};
+	}, []);
+
+	const openPopup = (url: string) => {
+		window.open(
+			url,
+			"_blank",
+			`
+			popup=true,
+			width=${(window.innerWidth * 2) / 3},
+			height=${(window.innerHeight * 2) / 3},
+			left=${window.innerWidth / 6},
+			top=${window.innerHeight / 6},
+		`,
+		);
+	};
+
 	return (
 		<div className="flex flex-col gap-4">
 			<UserInput
@@ -65,12 +95,12 @@ export default function LoginLoginPage() {
 			<ul className="flex flex-row items-center justify-center text-primary">
 				{providers.map((provider, i) => (
 					<Fragment key={i}>
-						<a
-							href={provider.authLink}
+						<button
+							onClick={() => openPopup(provider.authLink)}
 							className="w-fit cursor-pointer rounded-full bg-accent p-3 shadow-xl transition-all duration-200 hover:bg-secondary"
 						>
 							{provider.icon}
-						</a>
+						</button>
 					</Fragment>
 				))}
 			</ul>

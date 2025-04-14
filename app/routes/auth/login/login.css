@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "../../../../node_modules/tailwindcss";
 
 .user-input {
 	@apply flex w-full flex-row items-center justify-start gap-3 rounded-xl p-2;
