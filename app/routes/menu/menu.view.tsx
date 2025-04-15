@@ -7,37 +7,37 @@ import { Link } from "react-router";
 // import Cart, { isCart } from "~/lib/+types/cart";
 // import type Item from "~/lib/+types/item";
 // import type { CartItem } from "~/lib/+types/cart";
-import Cart, { type CartItem } from "~/utils/cart";
+import Cart, { cartDataObj, type CartItem, cartItemObj } from "~/utils/cart";
 import type { Item } from "~/routes/menu/menu.validation";
 import { getSession } from "~/routes/menu/menu.handler";
+import { Value } from "@sinclair/typebox/value";
 
-export default function MenuPage({ params }: { params: { sessId: string } }) {
+export default function MenuPage({
+	params: { sessId },
+}: {
+	params: { sessId: string };
+}) {
+	const STORAGE_KEY = `menu:${sessId}`;
 	const [menu, setMenu] = useState<Item[] | undefined>(undefined);
 	const [cart, setCart] = useState<Cart | undefined>(undefined);
 	const [numLineItems, setNumLineItems] = useState<number>(0);
 
 	useEffect(() => {
 		// Get item types
-		const sessId = params.sessId;
-
 		getSession(sessId)
 			.then((sess) => {
 				setMenu(sess.items);
 
-				const cartData = sessionStorage.getItem(sessId);
+				const cartData = sessionStorage.getItem(STORAGE_KEY);
 				// Parse empty string if data is null; "" will fail isCart test
 				const parsedData = JSON.parse(cartData ?? "{}");
 
-				let newCart: Cart;
-				if (Cart.isCart(parsedData)) {
-					console.log("Cart found! :)");
-					newCart = new Cart(parsedData);
-				} else {
-					console.log("No cart found.");
-					newCart = new Cart();
-				}
+				const newCart = Cart.isCart(parsedData)
+					? new Cart(parsedData)
+					: new Cart();
 
 				setCart(newCart);
+				setNumLineItems(newCart.numLineItems);
 			})
 			.catch((err) => console.warn(err));
 
@@ -103,15 +103,14 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 	const handleUpdate = (item: CartItem) => {
 		if (!cart || !menu) return;
 
-		if (item.count > 0) {
-			cart.addItem(item);
-			console.log("Item added to cart.", cart.toObject());
-		} else {
-			cart.removeItem(item);
-			console.log("Item removed from cart.", cart.toObject());
-		}
-
+		if (item.count > 0) cart.addItem(item);
+		else cart.removeItem(item);
 		setNumLineItems(cart.numLineItems);
+
+		// Update storage data
+		sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cart.toObject()));
+
+		// Visuals
 		createPebbleEffect(item.count > 0);
 	};
 
@@ -130,7 +129,7 @@ export default function MenuPage({ params }: { params: { sessId: string } }) {
 			</div>
 
 			<Link
-				to={`/checkout/${params.sessId}`}
+				to={`/checkout/${sessId}`}
 				id="checkout-btn-container"
 				className="gooey fixed bottom-10 left-10 z-[9999]"
 				viewTransition
@@ -203,6 +202,13 @@ function MenuItem(props: MenuItemProps) {
 
 	const [opened, setOpened] = useState(false);
 	const [options, setOptions] = useState(undefined);
+
+	useEffect(() => {
+		let initCount = 0;
+		for (const item of props.itemChildren) initCount += item.count;
+
+		setCount(initCount);
+	}, []);
 
 	useEffect(() => {
 		if (opened && !options) {

@@ -6,7 +6,7 @@ export const cartItemObj = t.Object({
 	id: t.Integer(),
 	name: t.String(),
 	description: t.Optional(Nullable(t.String())),
-	img_url: t.Optional(Nullable(t.String({ format: "uri" }))),
+	img_url: t.Optional(Nullable(t.String())),
 	count: t.Integer(),
 	unit_price: t.Integer(),
 	selections: t.Array(t.Integer()), // Array of selection ids
