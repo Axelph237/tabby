@@ -22,7 +22,7 @@
 }
 
 .slide-auth-body-out {
-	animation: slide-out 400ms 200ms ease-in forwards;
+	animation: slide-out 400ms 200ms linear forwards;
 }
 @keyframes slide-out {
 	from {
