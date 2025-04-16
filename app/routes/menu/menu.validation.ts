@@ -40,26 +40,27 @@ export const itemTObj = t.Object({
 });
 export type Item = Static<typeof itemTObj>;
 
+export const itemWithOptsTObj = t.Intersect([
+	// Item
+	itemTObj,
+	t.Object({
+		// Options
+		options: t.Array(
+			t.Intersect([
+				itemOptionTObj,
+				t.Object({
+					// Selections
+					selections: t.Array(itemSelectTObj),
+				}),
+			]),
+		),
+	}),
+]);
+export type ItemWithOpts = Static<typeof itemWithOptsTObj>;
+
 export const sessionDetailsTObj = t.Object({
 	menu_name: t.String(),
 	expires_at: t.Date(),
-	items: t.Array(
-		t.Intersect([
-			// Item
-			itemTObj,
-			t.Object({
-				// Options
-				options: t.Array(
-					t.Intersect([
-						itemOptionTObj,
-						t.Object({
-							// Selections
-							selections: t.Array(itemSelectTObj),
-						}),
-					]),
-				),
-			}),
-		]),
-	),
+	items: t.Array(itemWithOptsTObj),
 });
 export type SessionDetails = Static<typeof sessionDetailsTObj>;
