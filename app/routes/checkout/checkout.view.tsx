@@ -1,45 +1,26 @@
 import { TabbyLogo } from "~/components/icons";
-import {
-	type ChangeEvent,
-	type FormEvent,
-	Fragment,
-	useEffect,
-	useRef,
-	useState,
-} from "react";
-// import { isItem, type Item } from "~/lib/item";
-import { Router } from "react-router";
-import type { Item } from "~/routes/menu/menu.validation";
-
-const tTotal = 10.56;
+import { type ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
+import Cart, { type CartItem } from "~/utils/cart";
+import { requestOrder } from "~/routes/checkout/checkout.handler";
 
 export default function CheckoutPage({
-	params,
+	params: { menuId },
 }: {
 	params: { menuId: string };
 }) {
-	const [cartItems, setCartItems] = useState<undefined>(undefined);
+	const STORAGE_KEY = `menu:${menuId}`;
 	const [name, setName] = useState("");
-	const inputRef = useRef(null);
+	const [cart, setCart] = useState<Cart | undefined>(undefined);
+	const inputRef = useRef<HTMLInputElement>(null);
 
-	// useEffect(() => {
-	// 	const menuId = params.menuId;
-	// 	const sessionData = sessionStorage.getItem(menuId);
-	//
-	// 	if (sessionData) {
-	// 		const cartData: Item[] = JSON.parse(sessionData);
-	//
-	// 		const items = [];
-	// 		for (let i = 0; i < cartData.length; i++) {
-	// 			if (isItem(cartData[i])) items.push(cartData[i]);
-	// 		}
-	//
-	// 		setCartItems(items);
-	// 	} else {
-	// 		// No menu data found
-	// 		throw Error(`Failed to find cart data for menuId ${menuId}`);
-	// 	}
-	// }, []);
+	useEffect(() => {
+		const sessionData = sessionStorage.getItem(STORAGE_KEY);
+		const parsedData = JSON.parse(sessionData ?? "{}");
+
+		if (Cart.isCart(parsedData))
+			setCart(new Cart(parsedData)); // No cart data found
+		else throw Error(`Failed to find cart data for menuId ${menuId}`);
+	}, []);
 
 	const handleNameInput = (e: ChangeEvent<HTMLInputElement>) => {
 		const text = (inputRef.current! as HTMLInputElement).value;
@@ -51,7 +32,16 @@ export default function CheckoutPage({
 	};
 
 	const handleSubmit = () => {
-		console.log("Placing order");
+		const guestName = (inputRef?.current as HTMLInputElement).value;
+
+		if (!cart || !guestName || guestName === "") {
+			console.log("Please enter valid name.");
+			return;
+		}
+
+		requestOrder(menuId, guestName, cart)
+			.then((res) => console.log("Created order:", res))
+			.catch((err) => console.log(err));
 	};
 
 	return (
@@ -93,15 +83,12 @@ export default function CheckoutPage({
 					</svg>
 
 					<ul className="flex flex-col gap-[10px] font-dongle text-[36px] text-primary">
-						{/*{cartItems &&*/}
-						{/*	cartItems.map((item, i) => (*/}
-						{/*		<Fragment key={i}>*/}
-						{/*			<CheckoutItem*/}
-						{/*				item={item}*/}
-						{/*				count={i + 1}*/}
-						{/*			/>*/}
-						{/*		</Fragment>*/}
-						{/*	))}*/}
+						{cart &&
+							cart.items.map((item, i) => (
+								<Fragment key={i}>
+									<CheckoutItem item={item} />
+								</Fragment>
+							))}
 					</ul>
 
 					<svg
@@ -120,7 +107,7 @@ export default function CheckoutPage({
 					</svg>
 					<p className="flex flex-row justify-between">
 						<span>TOTAL</span>
-						<span>${tTotal.toFixed(2)}</span>
+						<span>${((cart?.totalCost ?? 0) / 100).toFixed(2)}</span>
 					</p>
 				</div>
 
@@ -158,18 +145,21 @@ export default function CheckoutPage({
 	);
 }
 
-function CheckoutItem({ item, count }: { item: Item; count: number }) {
+function CheckoutItem({ item }: { item: CartItem }) {
 	return (
 		<div className="layered h-[64px] w-full items-center justify-center overflow-hidden rounded-2xl bg-secondary">
 			{item.img_url && (
 				<img
 					src={item.img_url}
 					alt={item.name}
-					className="top-0 left-0 aspect-auto w-[120%] object-cover opacity-35 blur-lg"
+					className="top-0 left-0 aspect-auto w-[120%] object-cover opacity-[0.2] blur-lg"
 				/>
 			)}
-			<p className="mx-6">
-				{count} {item.name}
+			<p className="mx-6 flex flex-row items-center justify-between">
+				<span>
+					{item.count} {item.name}
+				</span>
+				<span>${((item.count * item.unit_price) / 100).toFixed(2)}</span>
 			</p>
 		</div>
 	);

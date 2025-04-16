@@ -25,7 +25,8 @@
 	content: "";
 }
 #menu-body {
-	border-radius: var(--corner-size) 0 var(--corner-size) var(--corner-size);
+	border-radius: var(--corner-size) 0 0 0;
+	position: relative;
 }
 
 .item-body {

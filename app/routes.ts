@@ -18,7 +18,7 @@ export default [
 	// Menu page
 	route("/menu/:sessId", "routes/menu/menu.view.tsx"),
 	// Checkout page
-	route("/checkout/:menuId", "routes/checkout.tsx"),
+	route("/checkout/:menuId", "routes/checkout/checkout.view.tsx"),
 	// Status page
 	route("/order/status", "routes/status.tsx"),
 	route("/order/ready", "routes/ready.tsx"),

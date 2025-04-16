@@ -100,10 +100,10 @@ export default function MenuPage({
 		}
 	};
 
-	const handleUpdate = (item: CartItem) => {
+	const handleUpdate = (item: CartItem, addItem: boolean = true) => {
 		if (!cart || !menu) return;
 
-		if (item.count > 0) cart.addItem(item);
+		if (addItem) cart.addItem(item);
 		else cart.removeItem(item);
 		setNumLineItems(cart.numLineItems);
 
@@ -111,15 +111,15 @@ export default function MenuPage({
 		sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cart.toObject()));
 
 		// Visuals
-		createPebbleEffect(item.count > 0);
+		createPebbleEffect(addItem);
 	};
 
 	return (
 		<main
 			id="order-page-main"
-			className="no-scroll h-screen w-screen overflow-y-auto"
+			className="no-scroll h-screen w-screen overflow-y-auto bg-primary"
 		>
-			<div className="fixed h-1/2 w-full lg:h-1/2">
+			<div className="fixed h-1/2 w-full bg-secondary lg:h-1/2">
 				<img
 					id="order-page-img"
 					src="/test-menu-img.jpg"
@@ -146,7 +146,7 @@ export default function MenuPage({
 				</button>
 			</Link>
 
-			<div className={`relative flex h-full flex-col justify-end px-[15px]`}>
+			<div className="relative flex h-full flex-col justify-end">
 				{/* Menu */}
 				<div
 					id="menu-container"
@@ -193,7 +193,7 @@ export default function MenuPage({
 interface MenuItemProps extends HTMLProps<HTMLDivElement> {
 	item: Item;
 	itemChildren: CartItem[];
-	onUpdate: (item: CartItem) => void;
+	onUpdate: (item: CartItem, addItem: boolean) => void;
 }
 
 function MenuItem(props: MenuItemProps) {
@@ -216,42 +216,28 @@ function MenuItem(props: MenuItemProps) {
 		}
 	}, [opened]);
 
-	const handleAdd = () => {
+	const updateItem = (addItem: boolean = true) => {
 		if (!clicked) setClicked(true);
 
-		setCount(count + 1);
+		if (!addItem && count <= 0) return;
+
+		setCount(addItem ? count + 1 : count - 1);
 
 		// Call parent function
-		props.onUpdate({
-			// Inherited props
-			id: props.item.id,
-			name: props.item.name,
-			description: props.item.description,
-			img_url: props.item.img_url,
-			// New props
-			unit_price: props.item.base_price,
-			count: 1,
-			selections: [],
-		});
-	};
-
-	const handleSub = () => {
-		if (count <= 0) return;
-
-		setCount(count - 1);
-
-		// Call parent function
-		props.onUpdate({
-			// Inherited props
-			id: props.item.id,
-			name: props.item.name,
-			description: props.item.description,
-			img_url: props.item.img_url,
-			// New props
-			unit_price: props.item.base_price,
-			count: -1,
-			selections: [],
-		});
+		props.onUpdate(
+			{
+				// Inherited props
+				id: props.item.id,
+				name: props.item.name,
+				description: props.item.description,
+				img_url: props.item.img_url,
+				// New props
+				unit_price: props.item.base_price,
+				count: 1,
+				selections: [],
+			},
+			addItem,
+		);
 	};
 
 	return (
@@ -285,7 +271,7 @@ function MenuItem(props: MenuItemProps) {
 				{!clicked ? (
 					<button
 						className="btn size-full"
-						onClick={handleAdd}
+						onClick={() => updateItem(true)}
 					>
 						Add
 					</button>
@@ -293,7 +279,7 @@ function MenuItem(props: MenuItemProps) {
 					<>
 						<button
 							className="btn relative aspect-square h-full animate-slideIn-r transition-all duration-200 hover:text-secondary"
-							onClick={handleSub}
+							onClick={() => updateItem(false)}
 						>
 							-
 						</button>
@@ -302,7 +288,7 @@ function MenuItem(props: MenuItemProps) {
 						</div>
 						<button
 							className="btn relative aspect-square h-full animate-slideIn-l transition-all duration-200 hover:text-secondary"
-							onClick={handleAdd}
+							onClick={() => updateItem(true)}
 						>
 							+
 						</button>
