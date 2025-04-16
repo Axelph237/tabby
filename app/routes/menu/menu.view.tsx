@@ -195,16 +195,16 @@ interface MenuItemProps extends HTMLProps<HTMLDivElement> {
 	onUpdate: (item: CartItem, addItem: boolean) => void;
 }
 
-function MenuItem(props: MenuItemProps) {
-	const [count, setCount] = useState(props.itemChildren.length);
-	const [clicked, setClicked] = useState(props.itemChildren.length > 0);
+function MenuItem({ item, itemChildren, onUpdate, ...props }: MenuItemProps) {
+	const [count, setCount] = useState(itemChildren.length);
+	const [clicked, setClicked] = useState(itemChildren.length > 0);
 
 	const [opened, setOpened] = useState(false);
 	const [options, setOptions] = useState(undefined);
 
 	useEffect(() => {
 		let initCount = 0;
-		for (const item of props.itemChildren) initCount += item.count;
+		for (const item of itemChildren) initCount += item.count;
 
 		setCount(initCount);
 	}, []);
@@ -223,15 +223,15 @@ function MenuItem(props: MenuItemProps) {
 		setCount(addItem ? count + 1 : count - 1);
 
 		// Call parent function
-		props.onUpdate(
+		onUpdate(
 			{
 				// Inherited props
-				id: props.item.id,
-				name: props.item.name,
-				description: props.item.description,
-				img_url: props.item.img_url,
+				id: item.id,
+				name: item.name,
+				description: item.description,
+				img_url: item.img_url,
 				// New props
-				unit_price: props.item.base_price,
+				unit_price: item.base_price,
 				count: 1,
 				selections: [],
 			},
@@ -247,20 +247,18 @@ function MenuItem(props: MenuItemProps) {
 			{/* Info Body */}
 			<div className="item-body h-[200px] w-2/3 bg-secondary p-[10px]">
 				<h2 className="font-dongle text-3xl sm:text-4xl lg:text-5xl">
-					{props.item.name}
+					{item.name}
 				</h2>
-				<p className="opacity-60 sm:text-lg lg:text-xl">
-					{props.item.description}
-				</p>
+				<p className="opacity-60 sm:text-lg lg:text-xl">{item.description}</p>
 			</div>
 
 			{/* Img */}
 			<div className="item-img-container relative flex h-[150px] w-1/3 items-center justify-center bg-secondary p-[10px]">
-				{props.item.img_url && (
+				{item.img_url && (
 					<img
 						className="item-img h-full w-full rounded-xl object-cover"
-						src={props.item.img_url}
-						alt={props.item.name}
+						src={item.img_url}
+						alt={item.name}
 					/>
 				)}
 			</div>
