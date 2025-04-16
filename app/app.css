@@ -13,13 +13,18 @@
 
 /* Tailwind design tokens */
 @theme {
+	--breakpoint-xs: 30rem;
+
 	--font-sans:
 		"Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
 		"Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
 	--color-primary: #eeebd8;
+	--color-primary-dark: #cdcda8;
 	--color-secondary: #45734c;
+	--color-secondary-dark: #254f33;
 	--color-accent: #353938;
+	--color-accent-dark: #2a2f2e;
 
 	--font-dongle: "Dongle", "sans-serif";
 	--font-redacted-script: "Redacted Script", "cursive";
@@ -147,7 +152,7 @@ body {
 }
 
 .btn {
-	@apply flex cursor-pointer items-center justify-center rounded-xl bg-accent font-red-hat-text font-bold;
+	@apply flex cursor-pointer items-center justify-center rounded-xl bg-accent font-red-hat-text font-bold hover:bg-accent-dark;
 }
 
 .layered {

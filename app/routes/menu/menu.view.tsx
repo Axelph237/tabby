@@ -8,6 +8,7 @@ import type {
 	SessionDetails,
 } from "~/routes/menu/menu.validation";
 import { getSession } from "~/routes/menu/menu.handler";
+import MenuItem from "~/routes/menu/components/menu-item.component";
 
 export default function MenuPage({
 	params: { sessId },
@@ -186,112 +187,5 @@ export default function MenuPage({
 				</div>
 			</div>
 		</main>
-	);
-}
-
-interface MenuItemProps extends HTMLProps<HTMLDivElement> {
-	item: ItemWithOpts;
-	itemChildren: CartItem[];
-	onUpdate: (item: CartItem, addItem: boolean) => void;
-}
-
-function MenuItem({ item, itemChildren, onUpdate, ...props }: MenuItemProps) {
-	const [count, setCount] = useState(itemChildren.length);
-	const [clicked, setClicked] = useState(itemChildren.length > 0);
-
-	const [opened, setOpened] = useState(false);
-	const [options, setOptions] = useState(undefined);
-
-	useEffect(() => {
-		let initCount = 0;
-		for (const item of itemChildren) initCount += item.count;
-
-		setCount(initCount);
-	}, []);
-
-	useEffect(() => {
-		if (opened && !options) {
-			// On first open get option data for item.
-		}
-	}, [opened]);
-
-	const updateItem = (addItem: boolean = true) => {
-		if (!clicked) setClicked(true);
-
-		if (!addItem && count <= 0) return;
-
-		setCount(addItem ? count + 1 : count - 1);
-
-		// Call parent function
-		onUpdate(
-			{
-				// Inherited props
-				id: item.id,
-				name: item.name,
-				description: item.description,
-				img_url: item.img_url,
-				// New props
-				unit_price: item.base_price,
-				count: 1,
-				selections: [],
-			},
-			addItem,
-		);
-	};
-
-	return (
-		<div
-			className="item-container relative flex w-full flex-row"
-			{...props}
-		>
-			{/* Info Body */}
-			<div className="item-body h-[200px] w-2/3 bg-secondary p-[10px]">
-				<h2 className="font-dongle text-3xl sm:text-4xl lg:text-5xl">
-					{item.name}
-				</h2>
-				<p className="opacity-60 sm:text-lg lg:text-xl">{item.description}</p>
-			</div>
-
-			{/* Img */}
-			<div className="item-img-container relative flex h-[150px] w-1/3 items-center justify-center bg-secondary p-[10px]">
-				{item.img_url && (
-					<img
-						className="item-img h-full w-full rounded-xl object-cover"
-						src={item.img_url}
-						alt={item.name}
-					/>
-				)}
-			</div>
-
-			{/* Buttons */}
-			<div className="absolute right-0 bottom-0 flex h-[50px] w-1/3 items-center justify-center justify-evenly p-[5px] md:justify-center md:gap-[20px]">
-				{!clicked ? (
-					<button
-						className="btn size-full"
-						onClick={() => updateItem(true)}
-					>
-						Add
-					</button>
-				) : (
-					<>
-						<button
-							className="btn relative aspect-square h-full animate-slideIn-r transition-all duration-200 hover:text-secondary"
-							onClick={() => updateItem(false)}
-						>
-							-
-						</button>
-						<div className="item-count-input flex h-full w-[50px] items-center justify-center rounded-xl bg-accent font-red-hat-text font-bold">
-							{count}
-						</div>
-						<button
-							className="btn relative aspect-square h-full animate-slideIn-l transition-all duration-200 hover:text-secondary"
-							onClick={() => updateItem(true)}
-						>
-							+
-						</button>
-					</>
-				)}
-			</div>
-		</div>
 	);
 }
