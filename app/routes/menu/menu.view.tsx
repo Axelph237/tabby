@@ -1,16 +1,13 @@
 import "/app/routes/menu/menu.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
-import { tItemTypes } from "~/lib/+types/testTypes";
 import { Link } from "react-router";
-// import type ItemType from "~/lib/+types/item-type";
-// import Cart, { isCart } from "~/lib/+types/cart";
-// import type Item from "~/lib/+types/item";
-// import type { CartItem } from "~/lib/+types/cart";
-import Cart, { cartDataObj, type CartItem, cartItemObj } from "~/utils/cart";
-import type { Item } from "~/routes/menu/menu.validation";
+import Cart, { type CartItem } from "~/utils/cart";
+import type {
+	ItemWithOpts,
+	SessionDetails,
+} from "~/routes/menu/menu.validation";
 import { getSession } from "~/routes/menu/menu.handler";
-import { Value } from "@sinclair/typebox/value";
 
 export default function MenuPage({
 	params: { sessId },
@@ -18,16 +15,18 @@ export default function MenuPage({
 	params: { sessId: string };
 }) {
 	const STORAGE_KEY = `menu:${sessId}`;
-	const [menu, setMenu] = useState<Item[] | undefined>(undefined);
+	const [menu, setMenu] = useState<ItemWithOpts[] | undefined>(undefined);
 	const [cart, setCart] = useState<Cart | undefined>(undefined);
 	const [numLineItems, setNumLineItems] = useState<number>(0);
 
 	useEffect(() => {
 		// Get item types
 		getSession(sessId)
-			.then((sess) => {
+			.then((sess: SessionDetails) => {
 				setMenu(sess.items);
 
+				// TODO update items in cart to mirror potential changes on menu
+				// i.e. price changes, options being removed, etc.
 				const cartData = sessionStorage.getItem(STORAGE_KEY);
 				// Parse empty string if data is null; "" will fail isCart test
 				const parsedData = JSON.parse(cartData ?? "{}");
@@ -191,7 +190,7 @@ export default function MenuPage({
 }
 
 interface MenuItemProps extends HTMLProps<HTMLDivElement> {
-	item: Item;
+	item: ItemWithOpts;
 	itemChildren: CartItem[];
 	onUpdate: (item: CartItem, addItem: boolean) => void;
 }
