@@ -1,8 +1,9 @@
+import { motion, type MotionAdvancedProps } from "motion/react";
 import { type HTMLProps, useEffect, useState } from "react";
-import type { ItemWithOpts } from "~/routes/menu/menu.validation";
+import type { ItemWithOpts } from "~/routes/guest/menu/menu.validation";
 import type { CartItem } from "~/utils/cart";
 
-interface MenuItemProps extends HTMLProps<HTMLDivElement> {
+interface MenuItemProps extends MotionAdvancedProps {
 	item: ItemWithOpts;
 	itemChildren: CartItem[];
 	onUpdate: (item: CartItem, addItem: boolean) => void;
@@ -103,7 +104,7 @@ export default function MenuItem({
 					{
 						<button
 							className="btn size-full text-sm sm:text-lg"
-							onClick={() => console.log("Add clicked")}
+							onClick={() => updateItem(true)}
 						>
 							Add
 						</button>

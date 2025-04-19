@@ -6,7 +6,7 @@ import {
 	TabbyLogo,
 } from "~/components/icons";
 import Lottie from "react-lottie-player";
-import checkmarkLottie from "public/lotties/checkmark.json";
+import checkmarkLottie from "../../../public/lotties/checkmark.json";
 
 export default function QueuePage() {
 	return (

@@ -1,5 +1,5 @@
 import { BurgerIcon, FireIcon, SendIcon, TabbyLogo } from "~/components/icons";
-import "../../public/styles/status.css";
+import "../../../public/styles/status.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 

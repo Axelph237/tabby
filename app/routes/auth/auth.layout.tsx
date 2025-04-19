@@ -1,4 +1,4 @@
-import "/app/routes/menu/menu.css";
+import "/app/routes/guest/menu/menu.css";
 import { Outlet } from "react-router";
 import { TabbyLogo } from "~/components/icons";
 import { useEffect, useRef, useState } from "react";

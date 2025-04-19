@@ -16,6 +16,7 @@
 		"@sinclair/typebox": "^0.34.33",
 		"isbot": "^5.1.17",
 		"js-cookie": "^3.0.5",
+		"motion": "^12.7.3",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-lottie-player": "^2.1.0",

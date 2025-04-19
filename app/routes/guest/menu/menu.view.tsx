@@ -1,4 +1,4 @@
-import "/app/routes/menu/menu.css";
+import "/app/routes/guest/menu/menu.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/components/icons";
 import { Link } from "react-router";
@@ -6,15 +6,17 @@ import Cart, { type CartItem } from "~/utils/cart";
 import type {
 	ItemWithOpts,
 	SessionDetails,
-} from "~/routes/menu/menu.validation";
-import { getSession } from "~/routes/menu/menu.handler";
-import MenuItem from "~/routes/menu/components/menu-item.component";
+} from "~/routes/guest/menu/menu.validation";
+import { getSession } from "~/routes/guest/menu/menu.handler";
+import MenuItem from "~/routes/guest/menu/components/menu-item.component";
+import { motion, useScroll } from "framer-motion";
 
 export default function MenuPage({
 	params: { sessId },
 }: {
 	params: { sessId: string };
 }) {
+	const { scrollYProgress } = useScroll();
 	const STORAGE_KEY = `menu:${sessId}`;
 	const [menu, setMenu] = useState<ItemWithOpts[] | undefined>(undefined);
 	const [cart, setCart] = useState<Cart | undefined>(undefined);
@@ -62,7 +64,7 @@ export default function MenuPage({
 			}
 		};
 
-		const main = document.getElementById("order-page-main");
+		const main = document.getElementById("guest-main");
 
 		main?.addEventListener("scroll", handleScroll);
 
@@ -115,36 +117,43 @@ export default function MenuPage({
 	};
 
 	return (
-		<main
-			id="order-page-main"
-			className="no-scroll h-screen w-screen overflow-y-auto bg-primary"
+		<motion.div
+			id="menu-page-container"
+			className="relative h-screen w-screen"
+			key="menu-page-container"
+			exit={{ top: "-3000px", opacity: 0 }}
 		>
 			<div className="fixed h-1/2 w-full bg-secondary lg:h-1/2">
-				<img
-					id="order-page-img"
-					src="/test-menu-img.jpg"
-					alt="restaurant"
-					className="h-full w-full object-cover"
-				/>
+				{/*<motion.img*/}
+				{/*	id="order-page-img"*/}
+				{/*	src="/test-menu-img.jpg"*/}
+				{/*	alt="restaurant"*/}
+				{/*	className="h-full w-full object-cover"*/}
+				{/*	style={{*/}
+				{/*		scale: scrollYProgress*/}
+				{/*	}}*/}
+				{/*/>*/}
 			</div>
 
-			<Link
-				to={`/checkout/${sessId}`}
-				id="checkout-btn-container"
-				className="gooey fixed bottom-10 left-10 z-[9999]"
-				viewTransition
-			>
-				<button
-					id="checkout-button"
-					className="flex cursor-pointer flex-row gap-2 bg-accent px-6 py-4 font-bold transition-all duration-200 hover:text-secondary"
+			{numLineItems >= 1 && (
+				<Link
+					to={`/guest/checkout/${sessId}`}
+					id="checkout-btn-container"
+					className="gooey fixed bottom-10 left-10 z-[9999]"
+					viewTransition
 				>
-					<ReceiptIcon className="icon-sm" />
-					<span className="hidden md:block">Checkout</span>
-					<span className={`${numLineItems <= 0 && "hidden"}`}>
-						({numLineItems})
-					</span>
-				</button>
-			</Link>
+					<button
+						id="checkout-button"
+						className="flex cursor-pointer flex-row gap-2 bg-accent px-6 py-4 font-bold transition-all duration-200 hover:text-secondary"
+					>
+						<ReceiptIcon className="icon-sm" />
+						<span className="hidden md:block">Checkout</span>
+						<span className={`${numLineItems <= 0 && "hidden"}`}>
+							({numLineItems})
+						</span>
+					</button>
+				</Link>
+			)}
 
 			<div className="relative flex h-full flex-col justify-end">
 				{/* Menu */}
@@ -169,7 +178,7 @@ export default function MenuPage({
 					{/* Menu Body */}
 					<div
 						id="menu-body"
-						className="z-50 bg-primary p-[20px] shadow-lg sm:p-[30px] md:p-[50px] lg:p-[60px]"
+						className="z-50 bg-primary p-[20px] sm:p-[30px] md:p-[50px] lg:p-[60px]"
 					>
 						<ul className="flex flex-col items-center gap-10">
 							{menu &&
@@ -186,6 +195,6 @@ export default function MenuPage({
 					</div>
 				</div>
 			</div>
-		</main>
+		</motion.div>
 	);
 }

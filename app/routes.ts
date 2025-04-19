@@ -15,11 +15,16 @@ export default [
 		]),
 		route("callback", "routes/auth/callback/callback.view.tsx"),
 	]),
-	// Menu page
-	route("/menu/:sessId", "routes/menu/menu.view.tsx"),
-	// Checkout page
-	route("/checkout/:menuId", "routes/checkout/checkout.view.tsx"),
-	// Status page
-	route("/order/status", "routes/status.tsx"),
-	route("/order/ready", "routes/ready.tsx"),
+
+	// Guest routes
+	route("/guest", "routes/guest/guest.layout.tsx", [
+		// TODO Add index page
+		// Menu page
+		route("menu/:sessId", "routes/guest/menu/menu.view.tsx"),
+		// Checkout page
+		route("checkout/:menuId", "routes/guest/checkout/checkout.view.tsx"),
+		// Status page
+		route("order/status", "routes/guest/status.tsx"),
+		route("order/ready", "routes/guest/ready.tsx"),
+	]),
 ] satisfies RouteConfig;
