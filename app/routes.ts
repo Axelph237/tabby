@@ -27,4 +27,6 @@ export default [
 		route("order/status", "routes/guest/status.tsx"),
 		route("order/ready", "routes/guest/ready.tsx"),
 	]),
+
+	route("/dashboard", "routes/dashboard/dashboard.layout.tsx", []),
 ] satisfies RouteConfig;
