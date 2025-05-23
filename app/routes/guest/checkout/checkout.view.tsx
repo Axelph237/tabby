@@ -3,6 +3,7 @@ import { type ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
 import Cart, { type CartItem } from "~/utils/cart";
 import { requestOrder } from "~/routes/guest/checkout/checkout.handler";
 import { motion } from "motion/react";
+import FullWidthDottedLine from "~/components/fullWidthDottedLine";
 
 export default function CheckoutPage({
 	params: { menuId },
@@ -69,20 +70,8 @@ export default function CheckoutPage({
 					<span>QTY ITEM</span>
 					<span>PRICE</span>
 				</p>
-				<svg
-					width="100%"
-					height="30"
-				>
-					<line
-						x1="0"
-						y1="15"
-						x2="100%"
-						y2="15"
-						stroke="var(--color-accent)"
-						strokeWidth="1.5"
-						strokeDasharray="10,5"
-					/>
-				</svg>
+
+				<FullWidthDottedLine />
 
 				<ul className="flex flex-col gap-[10px] font-dongle text-[36px] text-primary">
 					{cart &&
@@ -93,20 +82,8 @@ export default function CheckoutPage({
 						))}
 				</ul>
 
-				<svg
-					width="100%"
-					height="30"
-				>
-					<line
-						x1="0"
-						y1="15"
-						x2="100%"
-						y2="15"
-						stroke="var(--color-accent)"
-						strokeWidth="1.5"
-						strokeDasharray="10,5"
-					/>
-				</svg>
+				<FullWidthDottedLine />
+
 				<p className="flex flex-row justify-between">
 					<span>TOTAL</span>
 					<span>${((cart?.totalCost ?? 0) / 100).toFixed(2)}</span>
