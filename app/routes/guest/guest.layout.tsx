@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import { AnimatePresence } from "framer-motion";
 import AnimatedOutlet from "~/utils/components/animated-outlet";
 
