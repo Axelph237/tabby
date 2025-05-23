@@ -1,5 +1,5 @@
 import "/app/routes/guest/menu/menu.css";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import { TabbyLogo } from "~/components/icons";
 import { useEffect, useRef, useState } from "react";
 import { getMe } from "~/api/user.handler";
@@ -11,6 +11,7 @@ import type { LottiePlayer } from "lottie-web";
 export default function AuthPage() {
 	const [loggedIn, setLoggedIn] = useState<boolean>(false);
 	const lottieRef = useRef(null);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const verifyLogin = (msg: MessageEvent<any>) => {
@@ -31,6 +32,10 @@ export default function AuthPage() {
 			window.removeEventListener("message", verifyLogin);
 		};
 	}, []);
+
+	const navigateToDashboard = () => {
+		navigate("dashboard");
+	};
 
 	return (
 		<main
@@ -68,6 +73,7 @@ export default function AuthPage() {
 					ref={lottieRef}
 					loop={false}
 					animationData={checkmarkLottie}
+					onComplete={navigateToDashboard}
 					className="h-full w-full"
 				/>
 			</div>
