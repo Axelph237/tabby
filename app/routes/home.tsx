@@ -2,6 +2,7 @@ import { type Route } from "../../.react-router/types/app/+types/root";
 // import logoDark from "../../public/react-router/logo-dark.svg";
 // import logoLight from "../../public/react-router/logo-light.svg";
 import { PlayIcon, TabbyLogo } from "~/components/icons";
+import { useNavigate } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
 	return [
@@ -11,6 +12,12 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function HomePage() {
+	const navigate = useNavigate();
+
+	const handleNavigate = (): void => {
+		navigate("dashboard");
+	};
+
 	return (
 		<main className="flex min-h-screen w-screen flex-col items-center justify-start gap-15 overflow-x-hidden bg-primary px-[20px] text-accent">
 			<div className="w-full">
@@ -43,7 +50,10 @@ export default function HomePage() {
 				those orders
 			</p>
 
-			<button className="relative right-0 left-[50px] flex cursor-pointer flex-row items-center justify-start gap-4 place-self-end rounded-xl bg-accent px-6 py-3 pr-[80px] font-red-hat-mono text-[36px] text-primary transition-all duration-300 hover:pr-[150px] hover:text-secondary">
+			<button
+				className="relative right-0 left-[50px] flex cursor-pointer flex-row items-center justify-start gap-4 place-self-end rounded-xl bg-accent px-6 py-3 pr-[80px] font-red-hat-mono text-[36px] text-primary transition-all duration-300 hover:pr-[150px] hover:text-secondary"
+				onClick={handleNavigate}
+			>
 				Create Menu
 				<PlayIcon className="icon-sm" />
 			</button>
