@@ -2,9 +2,9 @@ import "./dashboard.css";
 import { Fragment, useEffect, useState } from "react";
 import type { Menu } from "~/routes/guest/menu/menu.validation";
 import { PenIcon, RightArrowIcon, TabbyLogo } from "~/utils/components/icons";
-import FullWidthDottedLine from "~/utils/components/fullWidthDottedLine";
+import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
 import { motion, AnimatePresence } from "framer-motion";
-import { LoadingPage } from "~/utils/components/loadingPage";
+import { LoadingPage } from "~/utils/components/loading-page";
 
 export async function clientLoader() {
 	const res = await fetch("http://localhost:3000/menus", {

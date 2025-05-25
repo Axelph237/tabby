@@ -3,7 +3,7 @@ import { type ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
 import Cart, { type CartItem } from "~/utils/cart";
 import { requestOrder } from "~/routes/guest/checkout/checkout.handler";
 import { motion } from "motion/react";
-import FullWidthDottedLine from "~/utils/components/fullWidthDottedLine";
+import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
 
 export default function CheckoutPage({
 	params: { menuId },
