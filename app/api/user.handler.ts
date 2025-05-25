@@ -11,3 +11,5 @@ export async function getMe() {
 
 	return await response.json();
 }
+
+export default { getMe };
