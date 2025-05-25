@@ -1,10 +1,15 @@
 import "./dashboard.css";
 import { Fragment, useEffect, useState } from "react";
 import type { Menu } from "~/routes/guest/menu/menu.validation";
-import { PenIcon, RightArrowIcon, TabbyLogo } from "~/utils/components/icons";
+import {
+	PenIcon,
+	PlusIcon,
+	RightArrowIcon,
+	TabbyLogo,
+} from "~/utils/components/icons";
 import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
 import { motion, AnimatePresence } from "framer-motion";
-import { LoadingPage } from "~/utils/components/loading-page";
+import Dashboard from "./dashboard.handler";
 
 export async function clientLoader() {
 	const res = await fetch("http://localhost:3000/menus", {
@@ -25,10 +30,10 @@ export default function DashboardLayout({
 	const [selectedIndex, setSelectedIndex] = useState<number | undefined>(
 		undefined,
 	);
-	const [selectedMenu, setSelectedMenu] = useState<Menu | undefined>(undefined);
+	const [creatingMenu, setCreatingMenu] = useState(false);
 
 	useEffect(() => {
-		if (menus) setSelectedMenu(menus[0]);
+		if (menus) setSelectedIndex(0);
 
 		console.log("Menus", menus);
 	}, [menus]);
@@ -47,7 +52,16 @@ export default function DashboardLayout({
 				: Math.max(0, (selectedIndex ?? 0) + shift);
 
 		setSelectedIndex(newIndex);
-		setSelectedMenu(menus[newIndex]);
+	};
+
+	const handleClickCreateMenu = () => {
+		Dashboard.createMenu({
+			name: "Untitled Menu",
+		})
+			.then((menu: Menu) => {
+				setMenus(menus ? [...menus, menu] : [menu]);
+			})
+			.catch((err) => console.log(err));
 	};
 
 	return (
@@ -55,35 +69,31 @@ export default function DashboardLayout({
 			<header className="z-[9999] flex h-[100px] w-screen flex-row items-center justify-between bg-accent p-6">
 				{/* Header Label */}
 				<AnimatePresence mode="wait">
-					{menus &&
-						menus.map(
-							(menu, i) =>
-								selectedMenu === menu && (
-									<motion.h1
-										className="relative font-red-hat-display text-5xl font-bold"
-										key={i}
-										initial={{ left: "-500px", opacity: 0 }}
-										animate={{
-											left: "0",
-											opacity: 1,
-											transition: { ease: "easeInOut" },
-										}}
-										exit={{ left: "-500px", opacity: 0 }}
-									>
-										{selectedMenu?.name}
-									</motion.h1>
-								),
-						)}
+					{menus && (
+						<motion.h1
+							key={selectedIndex}
+							className="relative font-red-hat-display text-5xl font-bold"
+							initial={{ left: "-500px", opacity: 0 }}
+							animate={{
+								left: "0",
+								opacity: 1,
+								transition: { ease: "easeInOut" },
+							}}
+							exit={{ left: "-500px", opacity: 0 }}
+						>
+							{menus[selectedIndex ?? 0].name}
+						</motion.h1>
+					)}
 				</AnimatePresence>
 
+				{/* Selection Dots */}
 				<div className="flex flex-row gap-2">
 					{menus &&
 						menus.map((menu, i) => (
 							<Fragment key={i}>
 								<div
-									className={`${selectedMenu === menu ? "aspect-[2/1]" : "aspect-square cursor-pointer hover:opacity-75"} h-6 rounded-full bg-primary transition-all duration-150`}
+									className={`${selectedIndex === i ? "aspect-[2/1]" : "aspect-square cursor-pointer hover:opacity-75"} h-6 rounded-full bg-primary transition-all duration-150`}
 									onClick={() => {
-										setSelectedMenu(menu);
 										setSelectedIndex(i);
 									}}
 								></div>
@@ -114,45 +124,44 @@ export default function DashboardLayout({
 				<div className="w-full">
 					<AnimatePresence mode="wait">
 						{/* All tickets made into individual elements for AnimatedPresence to track */}
-						{menus &&
-							menus.map(
-								(menu, i) =>
-									selectedMenu === menu && (
-										<motion.div
-											key={i}
-											className="relative z-[999] mx-10 mb-10 flex h-fit w-[350px] flex-col items-center rounded-br-2xl rounded-bl-2xl bg-primary px-6 pb-6 font-red-hat-mono text-xl"
-											initial={{ left: "100%" }}
-											animate={{ left: "0", transition: { ease: "easeInOut" } }}
-											exit={{ left: "-100%" }}
-										>
-											<h2 className="flex flex-row items-center font-dongle text-6xl">
-												<TabbyLogo className="icon-2xl" /> Tabby
-											</h2>
-											<h2>{menu.name}</h2>
-											<p className="text-sm opacity-75">
-												Last edited (some time)
-											</p>
+						{menus && (
+							<motion.div
+								key={selectedIndex}
+								className="relative z-[999] mx-10 mb-10 flex h-fit w-[350px] flex-col items-center rounded-br-2xl rounded-bl-2xl bg-primary px-6 pb-6 font-red-hat-mono text-xl"
+								initial={{ left: "100%" }}
+								animate={{ left: "0", transition: { ease: "easeInOut" } }}
+								exit={{ left: "-100%" }}
+							>
+								<h2 className="flex flex-row items-center font-dongle text-6xl">
+									<TabbyLogo className="icon-2xl" /> Tabby
+								</h2>
+								<h2>{menus[selectedIndex ?? 0].name}</h2>
+								<p className="text-sm opacity-75">Last edited (some time)</p>
 
-											<FullWidthDottedLine
-												line={{ strokeDasharray: "20", strokeWidth: "2" }}
-											/>
+								<FullWidthDottedLine
+									line={{ strokeDasharray: "20", strokeWidth: "2" }}
+								/>
 
-											<button
-												className="flex cursor-pointer flex-row items-center gap-2 rounded-xl bg-secondary p-4 font-red-hat-text font-bold text-primary shadow-lg transition-all duration-200 hover:bg-secondary-dark"
-												onClick={handleClickEdit}
-											>
-												<PenIcon className="icon-sm" />
-												Edit Menu
-											</button>
-										</motion.div>
-									),
-							)}
+								<button
+									className="flex cursor-pointer flex-row items-center gap-2 rounded-xl bg-secondary p-4 font-red-hat-text font-bold text-primary shadow-lg transition-all duration-200 hover:bg-secondary-dark"
+									onClick={handleClickEdit}
+								>
+									<PenIcon className="icon-sm" />
+									Edit Menu
+								</button>
+							</motion.div>
+						)}
 					</AnimatePresence>
 				</div>
-				<div className="flex h-full w-32 items-center justify-center opacity-99">
+				<div className="relative flex h-full w-32 items-center justify-center opacity-99">
 					<RightArrowIcon
 						className={`${menus && selectedIndex === menus.length - 1 && "hidden"} icon-lg cursor-pointer text-primary transition-all duration-200 hover:scale-120 hover:text-primary-dark`}
 						onClick={() => handleClickArrow(1)}
+					/>
+
+					<PlusIcon
+						className={`${!menus || (selectedIndex !== menus.length - 1 && "hidden")} icon-lg cursor-pointer text-primary transition-all duration-200 hover:scale-120 hover:text-primary-dark`}
+						onClick={handleClickCreateMenu}
 					/>
 				</div>
 			</main>
