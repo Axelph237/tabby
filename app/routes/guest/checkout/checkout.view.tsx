@@ -1,9 +1,9 @@
-import { TabbyLogo } from "~/components/icons";
+import { TabbyLogo } from "~/utils/components/icons";
 import { type ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
 import Cart, { type CartItem } from "~/utils/cart";
 import { requestOrder } from "~/routes/guest/checkout/checkout.handler";
 import { motion } from "motion/react";
-import FullWidthDottedLine from "~/components/fullWidthDottedLine";
+import FullWidthDottedLine from "~/utils/components/fullWidthDottedLine";
 
 export default function CheckoutPage({
 	params: { menuId },

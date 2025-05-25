@@ -1,6 +1,6 @@
 import "/app/routes/guest/menu/menu.css";
 import { Outlet, useNavigate } from "react-router";
-import { TabbyLogo } from "~/components/icons";
+import { TabbyLogo } from "~/utils/components/icons";
 import { useEffect, useRef, useState } from "react";
 import { getMe } from "~/api/user.handler";
 import "./auth.css";

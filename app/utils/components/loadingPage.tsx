@@ -1,5 +1,5 @@
 import Lottie from "react-lottie-player";
-import morphicLoaderLottie from "../../public/lotties/morphic-loader.json";
+import morphicLoaderLottie from "../../../public/lotties/morphic-loader.json";
 import { motion } from "framer-motion";
 
 export function LoadingPage() {
