@@ -28,5 +28,9 @@ export default [
 		route("order/ready", "routes/guest/ready.tsx"),
 	]),
 
-	route("/dashboard", "routes/dashboard/dashboard.layout.tsx", []),
+	// Protected routes
+	layout("utils/layouts/authenticated-layout.tsx", [
+		// Dashboard
+		route("/dashboard", "routes/dashboard/dashboard.layout.tsx", []),
+	]),
 ] satisfies RouteConfig;

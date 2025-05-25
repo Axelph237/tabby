@@ -1,5 +1,5 @@
 import "/app/routes/guest/menu/menu.css";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet, useNavigate, useSearchParams } from "react-router";
 import { TabbyLogo } from "~/utils/components/icons";
 import { useEffect, useRef, useState } from "react";
 import { getMe } from "~/api/user.handler";
@@ -11,6 +11,7 @@ import type { LottiePlayer } from "lottie-web";
 export default function AuthPage() {
 	const [loggedIn, setLoggedIn] = useState<boolean>(false);
 	const lottieRef = useRef(null);
+	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -34,7 +35,7 @@ export default function AuthPage() {
 	}, []);
 
 	const navigateToDashboard = () => {
-		navigate("dashboard");
+		navigate(searchParams.get("from") ?? "dashboard");
 	};
 
 	return (
