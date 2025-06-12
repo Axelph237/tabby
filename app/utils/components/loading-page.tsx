@@ -1,9 +1,13 @@
 import Lottie from "react-lottie-player";
-import morphicLoaderLottie from "../../public/lotties/morphic-loader.json";
+import morphicLoaderLottie from "../../../public/lotties/morphic-loader.json";
+import { motion } from "framer-motion";
 
 export function LoadingPage() {
 	return (
-		<main className="flex h-screen w-screen flex-row items-center justify-center">
+		<motion.main
+			className="flex h-screen w-screen flex-row items-center justify-center"
+			exit={{ opacity: 0 }}
+		>
 			<Lottie
 				loop
 				play
@@ -20,6 +24,6 @@ export function LoadingPage() {
 			{/*  animationData={morphicLoaderDarkLottie}*/}
 			{/*  className="h-full aspect-square hidden dark:block"*/}
 			{/*/>*/}
-		</main>
+		</motion.main>
 	);
 }

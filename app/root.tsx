@@ -9,8 +9,9 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import Svgfilters from "~/components/svgfilters";
-import { LoadingPage } from "~/components/loadingPage";
+import Svgfilters from "~/utils/components/svgfilters";
+import { LoadingPage } from "~/utils/components/loading-page";
+import { AnimatePresence } from "framer-motion";
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },

@@ -1,6 +1,6 @@
 import "/app/routes/guest/menu/menu.css";
-import { Outlet, useNavigate } from "react-router";
-import { TabbyLogo } from "~/components/icons";
+import { Outlet, useNavigate, useSearchParams } from "react-router";
+import { TabbyLogo } from "~/utils/components/icons";
 import { useEffect, useRef, useState } from "react";
 import { getMe } from "~/api/user.handler";
 import "./auth.css";
@@ -11,11 +11,16 @@ import type { LottiePlayer } from "lottie-web";
 export default function AuthPage() {
 	const [loggedIn, setLoggedIn] = useState<boolean>(false);
 	const lottieRef = useRef(null);
+	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		const verifyLogin = (msg: MessageEvent<any>) => {
+			console.log("Received message");
+
 			if (msg.data != "tabby.oauth_login.done") return;
+
+			console.log("Completed auth");
 
 			getMe()
 				.then((data) => {
@@ -24,7 +29,7 @@ export default function AuthPage() {
 						(lottieRef.current! as LottiePlayer).play();
 					}, 200);
 				})
-				.catch((err) => console.log(err));
+				.catch((err) => console.error(err));
 		};
 
 		window.addEventListener("message", verifyLogin);
@@ -34,7 +39,7 @@ export default function AuthPage() {
 	}, []);
 
 	const navigateToDashboard = () => {
-		navigate("dashboard");
+		navigate(searchParams.get("from") ?? "dashboard");
 	};
 
 	return (

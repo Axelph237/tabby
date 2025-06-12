@@ -1,6 +1,6 @@
 import "/app/routes/guest/menu/menu.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
-import { ReceiptIcon } from "~/components/icons";
+import { ReceiptIcon } from "~/utils/components/icons";
 import { Link } from "react-router";
 import Cart, { type CartItem } from "~/utils/cart";
 import type {

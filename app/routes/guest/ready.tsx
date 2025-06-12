@@ -4,7 +4,7 @@ import {
 	FireIcon,
 	SendIcon,
 	TabbyLogo,
-} from "~/components/icons";
+} from "~/utils/components/icons";
 import Lottie from "react-lottie-player";
 import checkmarkLottie from "../../../public/lotties/checkmark.json";
 
