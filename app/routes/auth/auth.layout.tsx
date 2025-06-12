@@ -2,7 +2,7 @@ import "/app/routes/guest/menu/menu.css";
 import { Outlet, useNavigate, useSearchParams } from "react-router";
 import { TabbyLogo } from "~/utils/components/icons";
 import { useEffect, useRef, useState } from "react";
-import { getMe } from "~/api/user.handler";
+import Auth from "~/api/user.handler";
 import "./auth.css";
 import checkmarkLottie from "../../../public/lotties/checkmark.json";
 import Lottie from "react-lottie-player";
@@ -22,7 +22,7 @@ export default function AuthPage() {
 
 			console.log("Completed auth");
 
-			getMe()
+			Auth.getMe()
 				.then((data) => {
 					setLoggedIn(true);
 					setTimeout(() => {

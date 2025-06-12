@@ -1,5 +1,5 @@
 // TODO Create better error formatting for response errors
-export async function getMe(): Promise<IUser> {
+async function getMe(): Promise<IUser> {
 	const domain = import.meta.env.VITE_API_DOMAIN || "http://localhost:3000";
 
 	const response = await fetch(`${domain}/user/me`, {
@@ -7,7 +7,7 @@ export async function getMe(): Promise<IUser> {
 		credentials: "include",
 	});
 
-	if (!response.ok) throw new Error("Bad response: " + (await response.json()));
+	if (!response.ok) throw new Error("Bad response: " + (await response.text()));
 
 	return await response.json();
 }
