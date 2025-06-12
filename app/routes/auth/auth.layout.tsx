@@ -29,7 +29,7 @@ export default function AuthPage() {
 						(lottieRef.current! as LottiePlayer).play();
 					}, 200);
 				})
-				.catch((err) => console.log(err));
+				.catch((err) => console.error(err));
 		};
 
 		window.addEventListener("message", verifyLogin);
