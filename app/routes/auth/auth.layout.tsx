@@ -16,7 +16,11 @@ export default function AuthPage() {
 
 	useEffect(() => {
 		const verifyLogin = (msg: MessageEvent<any>) => {
+			console.log("Received message");
+
 			if (msg.data != "tabby.oauth_login.done") return;
+
+			console.log("Completed auth");
 
 			getMe()
 				.then((data) => {

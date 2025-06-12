@@ -10,6 +10,7 @@ import {
 import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
 import { motion, AnimatePresence } from "framer-motion";
 import Dashboard from "./dashboard.handler";
+import { Outlet } from "react-router";
 
 export async function clientLoader() {
 	const res = await fetch("http://localhost:3000/menus", {
@@ -33,9 +34,7 @@ export default function DashboardLayout({
 	const [creatingMenu, setCreatingMenu] = useState(false);
 
 	useEffect(() => {
-		if (menus) setSelectedIndex(0);
-
-		console.log("Menus", menus);
+		if (menus && menus.length > 0) setSelectedIndex(0);
 	}, [menus]);
 
 	const handleClickEdit = () => {
@@ -44,7 +43,7 @@ export default function DashboardLayout({
 	};
 
 	const handleClickArrow = (shift: number) => {
-		if (!menus || shift === 0) return;
+		if (!menus || menus.length === 0 || shift === 0) return;
 
 		const newIndex =
 			shift > 0
@@ -69,7 +68,7 @@ export default function DashboardLayout({
 			<header className="z-[9999] flex h-[100px] w-screen flex-row items-center justify-between bg-accent p-6">
 				{/* Header Label */}
 				<AnimatePresence mode="wait">
-					{menus && (
+					{menus && menus.length > 0 && (
 						<motion.h1
 							key={selectedIndex}
 							className="relative font-red-hat-display text-5xl font-bold"
@@ -124,7 +123,7 @@ export default function DashboardLayout({
 				<div className="w-full">
 					<AnimatePresence mode="wait">
 						{/* All tickets made into individual elements for AnimatedPresence to track */}
-						{menus && (
+						{menus && menus.length > 0 && (
 							<motion.div
 								key={selectedIndex}
 								className="relative z-[999] mx-10 mb-10 flex h-fit w-[350px] flex-col items-center rounded-br-2xl rounded-bl-2xl bg-primary px-6 pb-6 font-red-hat-mono text-xl"
@@ -155,15 +154,16 @@ export default function DashboardLayout({
 				</div>
 				<div className="relative flex h-full w-32 items-center justify-center opacity-99">
 					<RightArrowIcon
-						className={`${menus && selectedIndex === menus.length - 1 && "hidden"} icon-lg cursor-pointer text-primary transition-all duration-200 hover:scale-120 hover:text-primary-dark`}
+						className={`${menus && (menus.length === 0 || selectedIndex === menus.length - 1) && "hidden"} icon-lg cursor-pointer text-primary transition-all duration-200 hover:scale-120 hover:text-primary-dark`}
 						onClick={() => handleClickArrow(1)}
 					/>
 
 					<PlusIcon
-						className={`${!menus || (selectedIndex !== menus.length - 1 && "hidden")} icon-lg cursor-pointer text-primary transition-all duration-200 hover:scale-120 hover:text-primary-dark`}
+						className={`${!menus || menus.length === 0 || (selectedIndex !== menus.length - 1 && "hidden")} icon-lg cursor-pointer text-primary transition-all duration-200 hover:scale-120 hover:text-primary-dark`}
 						onClick={handleClickCreateMenu}
 					/>
 				</div>
+				<Outlet />
 			</main>
 		</div>
 	);
