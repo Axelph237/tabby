@@ -7,7 +7,7 @@ export async function getMe() {
 		credentials: "include",
 	});
 
-	if (!response.ok) throw new Error("Bad response");
+	if (!response.ok) throw new Error("Bad response: " + (await response.json()));
 
 	return await response.json();
 }
