@@ -32,7 +32,10 @@ export default [
 	layout("utils/layouts/authenticated-layout.tsx", [
 		// Dashboard
 		route("/dashboard", "routes/dashboard/dashboard.layout.tsx", [
-			route("menu/:menuId", "routes/dashboard/edit/menu/edit-menu.view.tsx"),
+			route(
+				"edit/menu/:menuId",
+				"routes/dashboard/edit/menu/edit-menu.view.tsx",
+			),
 		]),
 	]),
 ] satisfies RouteConfig;
