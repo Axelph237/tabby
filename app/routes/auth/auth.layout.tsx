@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import Auth from "~/api/user.handler";
 import "./auth.css";
 import checkmarkLottie from "../../../public/lotties/checkmark.json";
-import Lottie from "react-lottie-player";
 import type { LottiePlayer } from "lottie-web";
+import ClientLottie from "~/utils/components/client-lottie";
 
 export default function AuthPage() {
 	const [loggedIn, setLoggedIn] = useState<boolean>(false);
@@ -74,7 +74,7 @@ export default function AuthPage() {
 			<div
 				className={`${!loggedIn && "hidden"} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2`}
 			>
-				<Lottie
+				<ClientLottie
 					ref={lottieRef}
 					loop={false}
 					animationData={checkmarkLottie}

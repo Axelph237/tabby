@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode, useEffect, useState } from "react";
 import { GoogleLogoIcon, LockIcon, UserIcon } from "~/utils/components/icons";
 import "./login.css";
-import { getMe } from "~/api/user.handler";
+import Auth from "~/api/user.handler";
 
 const providers = [
 	{

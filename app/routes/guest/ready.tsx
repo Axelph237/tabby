@@ -5,8 +5,8 @@ import {
 	SendIcon,
 	TabbyLogo,
 } from "~/utils/components/icons";
-import Lottie from "react-lottie-player";
 import checkmarkLottie from "../../../public/lotties/checkmark.json";
+import ClientLottie from "~/utils/components/client-lottie";
 
 export default function QueuePage() {
 	return (
@@ -30,7 +30,7 @@ export default function QueuePage() {
 					</h1>
 
 					<div className="flex aspect-square w-1/2 max-w-[300px] items-center justify-center">
-						<Lottie
+						<ClientLottie
 							loop={false}
 							animationData={checkmarkLottie}
 							play
