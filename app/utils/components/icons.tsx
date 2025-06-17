@@ -285,3 +285,43 @@ export function PlusIcon(props: SVGProps<SVGSVGElement>) {
 		</svg>
 	);
 }
+
+export function CaretRightIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			width="800px"
+			height="800px"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				fill-rule="evenodd"
+				clip-rule="evenodd"
+				d="M8.5 17C8.5 17.4045 8.74364 17.7691 9.11732 17.9239C9.49099 18.0787 9.92111 17.9931 10.2071 17.7071L15.2071 12.7071C15.5976 12.3166 15.5976 11.6834 15.2071 11.2929L10.2071 6.29289C9.92111 6.00689 9.49099 5.92134 9.11732 6.07612C8.74364 6.2309 8.5 6.59554 8.5 7V17Z"
+				fill="currentColor"
+			/>
+		</svg>
+	);
+}
+
+export function CaretDownIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			width="800px"
+			height="800px"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				fill-rule="evenodd"
+				clip-rule="evenodd"
+				d="M7.00003 8.5C6.59557 8.5 6.23093 8.74364 6.07615 9.11732C5.92137 9.49099 6.00692 9.92111 6.29292 10.2071L11.2929 15.2071C11.6834 15.5976 12.3166 15.5976 12.7071 15.2071L17.7071 10.2071C17.9931 9.92111 18.0787 9.49099 17.9239 9.11732C17.7691 8.74364 17.4045 8.5 17 8.5H7.00003Z"
+				fill="currentColor"
+			/>
+		</svg>
+	);
+}

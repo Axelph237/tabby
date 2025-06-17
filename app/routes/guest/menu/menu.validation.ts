@@ -8,6 +8,13 @@ export const menuTObj = t.Object({
 	created_at: t.Date(),
 	created_by: uuidObj,
 	name: t.String(),
+	style: t.Optional(
+		Nullable(
+			t.Object({
+				background_img: t.String({ format: "uri" }),
+			}),
+		),
+	),
 });
 export type Menu = Static<typeof menuTObj>;
 
