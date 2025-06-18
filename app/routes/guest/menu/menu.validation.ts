@@ -11,7 +11,16 @@ export const menuTObj = t.Object({
 	style: t.Optional(
 		Nullable(
 			t.Object({
-				background_img: t.String({ format: "uri" }),
+				backgroundImg: t.Optional(t.String({ format: "uri" })),
+				colors: t.Optional(
+					t.Partial(
+						t.Object({
+							primary: t.String(),
+							secondary: t.String(),
+						}),
+					),
+				),
+				checkoutMsg: t.Optional(t.String()),
 			}),
 		),
 	),

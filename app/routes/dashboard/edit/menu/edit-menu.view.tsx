@@ -1,12 +1,13 @@
-import { useState, type ComponentProps, type JSX } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import {
+	useState,
+	type ChangeEvent,
+	type ComponentProps,
+	type JSX,
+} from "react";
 import type { Menu } from "~/routes/guest/menu/menu.validation";
 import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
-import {
-	CaretDownIcon,
-	CaretRightIcon,
-	PenIcon,
-	TabbyLogo,
-} from "~/utils/components/icons";
+import { CaretRightIcon, PenIcon, TabbyLogo } from "~/utils/components/icons";
 
 export async function clientLoader({ params }: { params: { menuId: string } }) {
 	console.log("Menu id:", params.menuId);
@@ -25,18 +26,82 @@ export default function EditMenuPage({
 }: {
 	loaderData: Menu | undefined;
 }) {
-	console.log(loaderData);
 	if (!loaderData) return;
+
+	const [menuData, setMenuData] = useState<Menu>(loaderData);
+
+	const debounceFormEvent = (
+		func: (formData: FormData) => void,
+		delay: number,
+	) => {
+		let timeout: ReturnType<typeof setTimeout> | undefined = undefined;
+		return function (formChangeEvent: ChangeEvent<any>) {
+			clearTimeout(timeout);
+			const formData = new FormData(formChangeEvent.currentTarget);
+			timeout = setTimeout(() => {
+				func.apply(null, [formData]);
+			}, delay);
+		};
+	};
+
+	const validateForm = (formData: FormData) => {
+		const menuUpdates: Partial<Menu> = {};
+
+		// VALIDATION
+
+		// Customer Checkout
+		const checkoutMsg = formData.get("checkout-message") as string | null;
+		if (checkoutMsg) menuUpdates.style = { ...menuUpdates.style, checkoutMsg };
+
+		// Visuals
+		const backgroundImg = formData.get("background-image") as string | null;
+		const urlRegEx =
+			/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
+		if (backgroundImg && urlRegEx.test(backgroundImg))
+			menuUpdates.style = { ...menuUpdates.style, backgroundImg };
+
+		const primaryColor = formData.get("primary-color") as string | null;
+		const secondaryColor = formData.get("secondary-color") as string | null;
+
+		menuUpdates.style = {
+			...menuUpdates.style,
+			colors: {
+				primary: primaryColor || undefined,
+				secondary: secondaryColor || undefined,
+			},
+		};
+
+		// Verify updates are valid
+		if (!Object.is(menuUpdates, {}))
+			handleFormSubmit(menuUpdates)
+				.then((menu) => setMenuData(menu))
+				.catch((err) => console.error(err));
+	};
+
+	const handleFormSubmit = async (body: Partial<Menu>): Promise<Menu> => {
+		const res = await fetch(`/api/menus/${menuData.id}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(body),
+			credentials: "include",
+		});
+
+		if (res.status !== 200) throw new Error("Failed to submit form");
+
+		return await res.json();
+	};
 
 	return (
 		<main className="flex h-screen flex-row p-4">
-			{loaderData?.style?.background_img && (
+			{menuData?.style?.backgroundImg && (
 				<div
 					id="menu-bg-img-container"
 					className="absolute top-0 left-0 w-screen object-cover"
 				>
 					<img
-						src={loaderData.style.background_img}
+						src={menuData.style.backgroundImg}
 						alt="menu-bg-img"
 						id="menu-bg-img"
 						className="w-full object-cover opacity-75 blur-md"
@@ -50,16 +115,17 @@ export default function EditMenuPage({
 					Tabby
 				</h2>
 				<h2 className="font-red-hat-mono text-2xl text-accent">
-					{loaderData.name}
+					{menuData.name}
 				</h2>
 				<p className="text-sm opacity-75">Last edited (some time)</p>
 
-				<div className="settings-container w-full">
+				<form
+					onChange={debounceFormEvent(validateForm, 750)}
+					id="setting-container"
+					className="w-full overflow-scroll"
+				>
 					<SettingDropdown label="Analytics">
-						<p>Hello</p>
-						<p>Hello</p>
-						<p>Hello</p>
-						<p>Hello</p>
+						<p>STUB</p>
 					</SettingDropdown>
 
 					<FullWidthDottedLine
@@ -67,10 +133,7 @@ export default function EditMenuPage({
 					/>
 
 					<SettingDropdown label="Menu Hours">
-						<p>Hello</p>
-						<p>Hello</p>
-						<p>Hello</p>
-						<p>Hello</p>
+						<p>STUB</p>
 					</SettingDropdown>
 
 					<FullWidthDottedLine
@@ -78,10 +141,14 @@ export default function EditMenuPage({
 					/>
 
 					<SettingDropdown label="Customer Checkout">
-						<p>Hello</p>
-						<p>Hello</p>
-						<p>Hello</p>
-						<p>Hello</p>
+						<SettingInput
+							key={1}
+							label="Checkout Message"
+							type="text"
+							name="checkout-message"
+							defaultValue={menuData.style?.checkoutMsg || ""}
+							placeholder="Enter a message to be displayed at checkout"
+						/>
 					</SettingDropdown>
 
 					<FullWidthDottedLine
@@ -90,15 +157,44 @@ export default function EditMenuPage({
 
 					<SettingDropdown label="Visuals">
 						<SettingInput
+							key={1}
 							label="Background Image"
-							defaultValue={loaderData.style?.background_img || ""}
+							type="url"
+							name="background-image"
+							defaultValue={menuData.style?.backgroundImg || ""}
+							placeholder="Enter an image url"
 						/>
+						<SettingInput
+							key={2}
+							label="Menu Colors"
+						>
+							<span className="flex flex-row gap-2">
+								<label>
+									<input
+										className="rounded-full bg-transparent"
+										type="color"
+										name="primary-color"
+										defaultValue={menuData.style?.colors?.primary || ""}
+									/>
+									<p className="font-medium opacity-60">Primary</p>
+								</label>
+								<label>
+									<input
+										className="appearance-none rounded-full"
+										type="color"
+										name="secondary-color"
+										defaultValue={menuData.style?.colors?.secondary || ""}
+									/>
+									<p className="font-medium opacity-60">Secondary</p>
+								</label>
+							</span>
+						</SettingInput>
 					</SettingDropdown>
 
 					<FullWidthDottedLine
 						line={{ strokeDasharray: "20", strokeWidth: "2" }}
 					/>
-				</div>
+				</form>
 			</div>
 			{/* Items tab */}
 			<div className="h-full w-full"></div>
@@ -116,7 +212,7 @@ function SettingDropdown({
 	const [opened, setOpened] = useState(false);
 
 	return (
-		<form className="flex min-h-[20px] w-full flex-col gap-3 text-accent">
+		<div className="flex min-h-[20px] w-full flex-col gap-3 text-accent">
 			<span
 				className="setting-dropdown-label flex cursor-pointer flex-row items-center gap-3"
 				onClick={() => setOpened(!opened)}
@@ -128,25 +224,40 @@ function SettingDropdown({
 					/>
 				}
 			</span>
-			<ul className={`${!opened && "hidden"}`}>{children}</ul>
-		</form>
+			<AnimatePresence mode="wait">
+				<ul
+					className={`flex flex-col gap-2 ${!opened && "hidden"}`}
+					key={opened.toString()}
+				>
+					<AnimatePresence propagate>{children}</AnimatePresence>
+				</ul>
+			</AnimatePresence>
+		</div>
 	);
 }
 
 interface SettingInputProps extends ComponentProps<"input"> {
 	label: string;
+	key: number;
 }
 
 function SettingInput({ label, ...props }: SettingInputProps) {
 	return (
-		<label className="flex flex-col rounded-xl bg-secondary p-2 text-primary">
+		<motion.label
+			initial={{ opacity: 0, left: "-100%" }}
+			animate={{ opacity: 1, left: 0 }}
+			key={props.key}
+			className="relative flex flex-col rounded-xl bg-secondary p-2 text-primary"
+		>
 			<span className="flex items-center gap-2 font-dongle text-3xl">
 				<b>{label}</b> <PenIcon className="icon-xs opacity-60" />
 			</span>
-			<input
-				className="font-medium opacity-60 outline-none"
-				{...props}
-			/>
-		</label>
+			{props.children || (
+				<input
+					className="font-medium opacity-60 outline-none"
+					{...props}
+				/>
+			)}
+		</motion.label>
 	);
 }

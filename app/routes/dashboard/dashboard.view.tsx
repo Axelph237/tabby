@@ -10,7 +10,7 @@ import {
 import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
 import { motion, AnimatePresence } from "framer-motion";
 import Dashboard from "./dashboard.handler";
-import { Outlet, useOutletContext } from "react-router";
+import { Link, Outlet, useOutletContext } from "react-router";
 
 export async function clientLoader() {
 	const res = await fetch("/api/menus", {
@@ -37,11 +37,6 @@ export default function DashboardPage({
 	useEffect(() => {
 		if (menus && menus.length > 0) setSelectedIndex(0);
 	}, [menus]);
-
-	const handleClickEdit = () => {
-		// STUB
-		console.log("Edit clicked");
-	};
 
 	const handleClickArrow = (shift: number) => {
 		if (!menus || menus.length === 0 || shift === 0) return;
@@ -142,13 +137,13 @@ export default function DashboardPage({
 									line={{ strokeDasharray: "20", strokeWidth: "2" }}
 								/>
 
-								<button
+								<Link
 									className="flex cursor-pointer flex-row items-center gap-2 rounded-xl bg-secondary p-4 font-red-hat-text font-bold text-primary shadow-lg transition-all duration-200 hover:bg-secondary-dark"
-									onClick={handleClickEdit}
+									to={`edit/menu/${menus[selectedIndex ?? 0].id}`}
 								>
 									<PenIcon className="icon-sm" />
 									Edit Menu
-								</button>
+								</Link>
 							</motion.div>
 						)}
 					</AnimatePresence>
