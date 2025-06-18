@@ -74,7 +74,9 @@ export default function EditMenuPage({
 		// Verify updates are valid
 		if (!Object.is(menuUpdates, {}))
 			handleFormSubmit(menuUpdates)
-				.then((menu) => setMenuData(menu))
+				.then((menu) => {
+					setMenuData(menu);
+				})
 				.catch((err) => console.error(err));
 	};
 
