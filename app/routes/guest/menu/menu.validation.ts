@@ -5,8 +5,8 @@ import { Nullable } from "~/utils/types/nullable";
 // DEPRECATED
 export const menuTObj = t.Object({
 	id: uuidObj,
-	created_at: t.Date(),
-	created_by: uuidObj,
+	createdAt: t.Date(),
+	createdBy: uuidObj,
 	name: t.String(),
 	style: t.Optional(
 		Nullable(
@@ -29,8 +29,8 @@ export type Menu = Static<typeof menuTObj>;
 
 // DEPRECATED
 export const itemOnMenuTObj = t.Object({
-	item_id: t.Integer(),
-	menu_id: uuidObj,
+	itemId: t.Integer(),
+	menuId: uuidObj,
 });
 export type ItemOnMenu = Static<typeof itemOnMenuTObj>;
 
@@ -43,7 +43,7 @@ export type ItemOption = Static<typeof itemOptionTObj>;
 export const itemSelectTObj = t.Object({
 	label: t.String(),
 	price: t.Integer(),
-	is_default: t.Boolean(),
+	isDefault: t.Boolean(),
 });
 export type ItemSelection = Static<typeof itemSelectTObj>;
 
@@ -51,8 +51,8 @@ export const itemTObj = t.Object({
 	id: t.Integer(),
 	name: t.String(),
 	description: t.Optional(Nullable(t.String())),
-	img_url: t.Optional(Nullable(t.String({ format: "uri" }))),
-	base_price: t.Integer(),
+	imgUrl: t.Optional(Nullable(t.String({ format: "uri" }))),
+	basePrice: t.Integer(),
 });
 export type Item = Static<typeof itemTObj>;
 
@@ -75,8 +75,8 @@ export const itemWithOptsTObj = t.Intersect([
 export type ItemWithOpts = Static<typeof itemWithOptsTObj>;
 
 export const sessionDetailsTObj = t.Object({
-	menu_name: t.String(),
-	expires_at: t.Date(),
+	menuName: t.String(),
+	expiresAt: t.Date(),
 	items: t.Array(itemWithOptsTObj),
 });
 export type SessionDetails = Static<typeof sessionDetailsTObj>;

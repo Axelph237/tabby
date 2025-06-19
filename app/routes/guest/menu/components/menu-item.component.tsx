@@ -54,9 +54,9 @@ export default function MenuItem({
 				id: item.id,
 				name: item.name,
 				description: item.description,
-				img_url: item.img_url,
+				img_url: item.imgUrl,
 				// New props
-				unit_price: item.base_price,
+				unit_price: item.basePrice,
 				count: 1,
 				selections: [],
 			},
@@ -90,10 +90,10 @@ export default function MenuItem({
 				<div
 					className={`item-img-container relative flex h-3/4 w-full items-center justify-center bg-secondary p-[10px] transition-all duration-500`}
 				>
-					{item.img_url && (
+					{item.imgUrl && (
 						<img
 							className="item-img size-full rounded-xl object-cover"
-							src={item.img_url}
+							src={item.imgUrl}
 							alt={item.name}
 						/>
 					)}

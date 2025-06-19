@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+#settings-menu {
+	border-radius: var(--border-radius-playful);
+}
+
+#order-page-img {
+	mask-image: linear-gradient(black 40%, transparent);
+}
+
+/* menu header corner cutout */
+#display-menu-container {
+	--corner-size: var(--border-radius-playful);
+}
+#display-menu-header {
+	border-radius: var(--corner-size) var(--corner-size) 0 0;
+}
+#display-menu-header::after {
+	--size: calc(2 * var(--corner-size));
+	position: absolute;
+	width: var(--size);
+	height: var(--size);
+	left: calc(-1 * var(--size));
+	bottom: 0;
+
+	mask: var(--mask-corner-cutout-tl);
+	background: var(--color-primary);
+
+	content: "";
+}
+#display-menu-body {
+	border-radius: var(--corner-size) 0 0 0;
+	position: relative;
+}
+
+.item-body {
+	border-radius: var(--corner-size) 0 var(--corner-size) var(--corner-size);
+}
+.item-img-container {
+	border-radius: 0 var(--corner-size) var(--corner-size) 0;
+}
+.item-img-container::after {
+	--size: var(--corner-size);
+	position: absolute;
+	width: var(--size);
+	height: var(--size);
+	left: 0;
+	bottom: calc(-1 * var(--size));
+
+	mask: var(--mask-corner-cutout-br);
+	background: var(--color-secondary);
+
+	content: "";
+	z-index: 1000;
+}
+
+/* Hide scrollbar but allow scrolling */
+.no-scroll {
+	-ms-overflow-style: none; /* For Internet Explorer and Edge */
+	scrollbar-width: none; /* For Firefox */
+	overflow-y: scroll; /* Ensure scrolling is enabled */
+}
+
+.no-scroll::-webkit-scrollbar {
+	display: none; /* For Chrome, Safari, and Opera */
+}
+
+/* Style for the number input */
+input[type="number"] {
+	outline: none;
+}
+
+/* Customizing the number input buttons (WebKit browsers) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+	position: absolute;
+	opacity: 0;
+	visibility: hidden;
+}

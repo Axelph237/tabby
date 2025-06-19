@@ -278,7 +278,7 @@ export function PlusIcon(props: SVGProps<SVGSVGElement>) {
 			<path
 				d="M6 12H18M12 6V18"
 				stroke="currentColor"
-				strokeWidth="2"
+				strokeWidth="3"
 				strokeLinecap="round"
 				strokeLinejoin="round"
 			/>
