@@ -15,6 +15,7 @@ import type {
 import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
 import {
 	CaretRightIcon,
+	ImgIcon,
 	PenIcon,
 	PlusIcon,
 	SendIcon,
@@ -300,6 +301,17 @@ function DisplayMenu({ menuId }: { menuId: string }) {
 
 	const handleCreateItem = () => {
 		console.log("You clicked me!");
+
+		const blankItem: ItemWithOpts = {
+			id: -1,
+			name: "Untitled Item",
+			description: "description",
+			basePrice: 0,
+			imgUrl: null,
+			options: [],
+		};
+
+		setItems([...items, blankItem]);
 	};
 
 	return (
@@ -337,12 +349,20 @@ function DisplayMenu({ menuId }: { menuId: string }) {
 										<div className="flex h-full w-2/3 flex-col items-center justify-start">
 											{/* Info Body */}
 											<div
-												className={`item-body size-full bg-secondary p-[10px] transition-all duration-500`}
+												className={`item-body size-full overflow-hidden bg-secondary p-[10px] transition-all duration-500`}
 											>
-												<h2 className="font-dongle text-3xl sm:text-4xl lg:text-5xl">
+												<h2
+													contentEditable
+													suppressContentEditableWarning
+													className="font-dongle text-3xl break-normal outline-none sm:text-4xl lg:text-5xl"
+												>
 													{item.name}
 												</h2>
-												<p className="text-md font-medium opacity-60 sm:text-lg lg:text-xl">
+												<p
+													contentEditable
+													suppressContentEditableWarning
+													className="text-md overflow-y-scroll font-medium break-normal opacity-60 outline-none sm:text-lg lg:text-xl"
+												>
 													{item.description}
 												</p>
 											</div>
@@ -354,12 +374,16 @@ function DisplayMenu({ menuId }: { menuId: string }) {
 											<div
 												className={`item-img-container relative flex h-3/4 w-full items-center justify-center bg-secondary p-[10px] transition-all duration-500`}
 											>
-												{item.imgUrl && (
+												{item.imgUrl ? (
 													<img
 														className="item-img size-full rounded-xl object-cover"
 														src={item.imgUrl}
 														alt={item.name}
 													/>
+												) : (
+													<div className="item-img flex size-full cursor-pointer items-center justify-center rounded-xl bg-accent opacity-60 transition-all duration-150 hover:opacity-100">
+														<ImgIcon className="color-primary icon-md opacity-100" />
+													</div>
 												)}
 											</div>
 
