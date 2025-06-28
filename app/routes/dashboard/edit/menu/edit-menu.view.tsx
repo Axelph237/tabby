@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import {
 	Fragment,
 	useEffect,
+	useRef,
 	useState,
 	type ChangeEvent,
 	type ComponentProps,
@@ -18,6 +19,7 @@ import {
 	ImgIcon,
 	PenIcon,
 	PlusIcon,
+	SaveIcon,
 	SendIcon,
 	TabbyLogo,
 } from "~/utils/components/icons";
@@ -44,6 +46,23 @@ export default function EditMenuPage({
 	if (!loaderData) return;
 
 	const [menuData, setMenuData] = useState<Menu>(loaderData);
+	const [sessions, setSessions] = useState([]);
+
+	useEffect(() => {
+		fetch("/api/sessions?" + new URLSearchParams({ menuId: menuData.id }), {
+			method: "GET",
+			credentials: "include",
+		})
+			.then((res) => {
+				if (res.status === 200) return res.json();
+				throw new Error("Response not OK");
+			})
+			.then((data) => {
+				console.log(data);
+				setSessions(data);
+			})
+			.catch((err) => console.error(err));
+	}, []);
 
 	const debounceFormEvent = (
 		func: (formData: FormData) => void,
@@ -215,6 +234,12 @@ export default function EditMenuPage({
 						line={{ strokeDasharray: "20", strokeWidth: "2" }}
 					/>
 					<p>hello</p>
+
+					{sessions && sessions.length > 0 ? (
+						<></>
+					) : (
+						<button className="btn px-4 py-2">Create Session</button>
+					)}
 				</form>
 			</div>
 			{/* Items tab */}
@@ -309,17 +334,24 @@ function DisplayMenu({ menuId }: { menuId: string }) {
 			basePrice: 0,
 			imgUrl: null,
 			options: [],
+			createdAt: null,
+			updatedAt: null,
+			deletedAt: null,
 		};
 
 		setItems([...items, blankItem]);
 	};
+
+	// const handleSaveItem = (index: number, newItem: ItemWithOpts) => {
+
+	// }
 
 	return (
 		<div className="relative flex h-full w-2/3 flex-col justify-end">
 			{/* Menu */}
 			<div
 				id="display-menu-container"
-				className="relative flex max-h-2/3 flex-col"
+				className="relaitem={item}tive flex max-h-2/3 flex-col"
 			>
 				{/* Menu Header */}
 				<div
@@ -341,67 +373,22 @@ function DisplayMenu({ menuId }: { menuId: string }) {
 					className="z-50 flex flex-col gap-6 bg-primary p-[20px] sm:p-[30px] md:p-[50px] lg:p-[60px]"
 				>
 					<ul className="flex flex-col items-center gap-6">
-						{items &&
-							items.map((item, i) => (
-								<Fragment key={i}>
-									<div className="item-container relative flex h-[200px] w-full flex-row">
-										{/* LEFT COLUMN */}
-										<div className="flex h-full w-2/3 flex-col items-center justify-start">
-											{/* Info Body */}
-											<div
-												className={`item-body size-full overflow-hidden bg-secondary p-[10px] transition-all duration-500`}
-											>
-												<h2
-													contentEditable
-													suppressContentEditableWarning
-													className="font-dongle text-3xl break-normal outline-none sm:text-4xl lg:text-5xl"
-												>
-													{item.name}
-												</h2>
-												<p
-													contentEditable
-													suppressContentEditableWarning
-													className="text-md overflow-y-scroll font-medium break-normal opacity-60 outline-none sm:text-lg lg:text-xl"
-												>
-													{item.description}
-												</p>
-											</div>
-										</div>
-
-										{/* RIGHT COLUMN */}
-										<div className="flex h-full w-1/3 flex-col items-center justify-start">
-											{/* Img */}
-											<div
-												className={`item-img-container relative flex h-3/4 w-full items-center justify-center bg-secondary p-[10px] transition-all duration-500`}
-											>
-												{item.imgUrl ? (
-													<img
-														className="item-img size-full rounded-xl object-cover"
-														src={item.imgUrl}
-														alt={item.name}
-													/>
-												) : (
-													<div className="item-img flex size-full cursor-pointer items-center justify-center rounded-xl bg-accent opacity-60 transition-all duration-150 hover:opacity-100">
-														<ImgIcon className="color-primary icon-md opacity-100" />
-													</div>
-												)}
-											</div>
-
-											{/* Buttons */}
-											<div className="flex h-1/4 w-full items-start justify-center justify-evenly p-[5px] md:justify-center md:gap-[20px]">
-												{
-													<button
-														className="btn size-full text-sm opacity-60 transition-all duration-150 hover:opacity-100 sm:text-lg"
-														onClick={() => console.log("Clicked")}
-													>
-														<SendIcon className="icon-sm" />
-													</button>
-												}
-											</div>
-										</div>
-									</div>
-								</Fragment>
-							))}
+						<AnimatePresence>
+							{items &&
+								items.map((item, i) => (
+									<motion.div
+										initial={{ scale: 0 }}
+										animate={{ scale: 1 }}
+										className="size-full"
+										key={i}
+									>
+										<DisplayMenuItem
+											item={item}
+											exists={item.id != -1}
+										/>
+									</motion.div>
+								))}
+						</AnimatePresence>
 					</ul>
 					<button
 						className="btn w-full opacity-60 transition-all duration-150 hover:opacity-100"
@@ -409,6 +396,162 @@ function DisplayMenu({ menuId }: { menuId: string }) {
 					>
 						<PlusIcon className="icon-md" />
 					</button>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function DisplayMenuItem({
+	item,
+	exists,
+}: {
+	item: ItemWithOpts;
+	exists: boolean;
+}) {
+	const [currData, setCurrData] = useState<ItemWithOpts>(item);
+	const [saved, setSaved] = useState<boolean>(exists ?? true);
+
+	const handleChange = () => {
+		console.log("Changed!");
+		setSaved(false);
+	};
+
+	const handleSave = () => {
+		if (currData.id === -1 && !saved) {
+			setSaved(true); // Optimistic
+			fetch(`/api/items`, {
+				method: "POST",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(currData),
+			})
+				.then((res) => {
+					if (res.status === 200) return res.json();
+
+					throw new Error("Response received was not OK.");
+				})
+				.then((data: Item) => {
+					console.log("Created new item:", data);
+					setCurrData({ ...data, options: [] });
+				})
+				.catch((err) => {
+					setSaved(false);
+					console.log(err);
+				});
+		} else if (!saved) {
+			const newName = document.getElementById(
+				`name-input-${currData.id}`,
+			)?.innerText;
+			const newDescription = document.getElementById(
+				`desc-input-${currData.id}`,
+			)?.innerText;
+
+			setSaved(true); // Optimistic
+			fetch(`/api/items/${currData.id}`, {
+				method: "PUT",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					...currData,
+					name: newName,
+					description: newDescription,
+				}),
+			})
+				.then((res) => {
+					if (res.status === 200) return res.json();
+
+					throw new Error("Response received was not OK.");
+				})
+				.then((data: Item) => {
+					console.log("Item updated:", data);
+					setCurrData({ ...data, options: [] });
+				})
+				.catch((err) => {
+					setSaved(false);
+					console.log(err);
+				});
+		}
+	};
+
+	return (
+		<div
+			className="item-container relative flex h-[200px] w-full flex-row"
+			onInput={handleChange}
+		>
+			{/* LEFT COLUMN */}
+			<div className="flex h-full w-2/3 flex-col items-center justify-start">
+				{/* Info Body */}
+				<div
+					className={`item-body size-full overflow-hidden bg-secondary p-[10px] transition-all duration-500`}
+				>
+					<h2
+						contentEditable
+						suppressContentEditableWarning
+						id={`name-input-${currData.id}`}
+						className="font-dongle text-3xl break-normal outline-none sm:text-4xl lg:text-5xl"
+					>
+						{currData.name}
+					</h2>
+					<p
+						contentEditable
+						suppressContentEditableWarning
+						id={`desc-input-${currData.id}`}
+						className="text-md overflow-y-scroll font-medium break-normal opacity-60 outline-none sm:text-lg lg:text-xl"
+					>
+						{currData.description}
+					</p>
+				</div>
+			</div>
+
+			{/* RIGHT COLUMN */}
+			<div className="flex h-full w-1/3 flex-col items-center justify-start">
+				{/* Img */}
+				<div
+					className={`item-img-container relative flex h-3/4 w-full items-center justify-center bg-secondary p-[10px] transition-all duration-500`}
+				>
+					{currData.imgUrl ? (
+						<img
+							className="item-img size-full rounded-xl object-cover"
+							src={currData.imgUrl}
+							alt={currData.name}
+						/>
+					) : (
+						<div
+							className="item-img flex size-full cursor-pointer items-center justify-center rounded-xl bg-accent opacity-60 transition-all duration-150 hover:opacity-100"
+							id={`img-input-${currData.id}`}
+						>
+							<ImgIcon className="color-primary icon-md opacity-100" />
+						</div>
+					)}
+				</div>
+
+				{/* Buttons */}
+				<div className="flex h-1/4 w-full items-start justify-center justify-evenly p-[5px] md:justify-center md:gap-[20px]">
+					<AnimatePresence mode="wait">
+						{saved ? (
+							<motion.div
+								initial={{ scale: 0 }}
+								animate={{ scale: 1 }}
+								exit={{ scale: 0 }}
+								className="size-full rounded-xl border-6 border-accent text-sm opacity-60"
+							></motion.div>
+						) : (
+							<motion.button
+								initial={{ scale: 0 }}
+								animate={{ scale: 1 }}
+								exit={{ scale: 0 }}
+								className="btn size-full text-sm opacity-60 transition-all duration-150 hover:opacity-100 sm:text-lg"
+								onClick={handleSave}
+							>
+								{!saved && <SaveIcon className="icon-sm" />}
+							</motion.button>
+						)}
+					</AnimatePresence>
 				</div>
 			</div>
 		</div>

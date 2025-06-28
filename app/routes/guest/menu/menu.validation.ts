@@ -53,6 +53,9 @@ export const itemTObj = t.Object({
 	description: t.Optional(Nullable(t.String())),
 	imgUrl: t.Optional(Nullable(t.String({ format: "uri" }))),
 	basePrice: t.Integer(),
+	createdAt: Nullable(t.String()),
+	updatedAt: Nullable(t.String()),
+	deletedAt: Nullable(t.String()),
 });
 export type Item = Static<typeof itemTObj>;
 
