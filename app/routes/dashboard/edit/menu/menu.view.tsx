@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, type BoundingBox } from "motion/react";
 import {
 	Fragment,
 	useEffect,
@@ -30,6 +30,11 @@ export default function ExampleMenuPage() {
 	const { context } = useOutletContext() as { context: { menu: Menu } };
 
 	const [items, setItems] = useState<ItemWithOpts[]>([]);
+	const [menuBBox, setMenuBBox] = useState<DOMRectReadOnly | undefined>(
+		undefined,
+	);
+	const menuRef = useRef<HTMLDivElement>(null);
+	const itemsRef = useRef<HTMLUListElement>(null);
 
 	useEffect(() => {
 		fetch(`/api/items?${new URLSearchParams({ menuId: context.menu.id })}`)
@@ -41,6 +46,12 @@ export default function ExampleMenuPage() {
 			.then((data: ItemWithOpts[]) => setItems(data))
 			.catch((err) => console.error(err));
 	}, []);
+
+	useEffect(() => {
+		const box = menuRef.current?.getBoundingClientRect();
+		console.log("New menu rect:", box?.toJSON());
+		setMenuBBox(box);
+	}, [items]);
 
 	const handleCreateItem = () => {
 		console.log("You clicked me!");
@@ -64,7 +75,7 @@ export default function ExampleMenuPage() {
 		<motion.div
 			initial={{ top: "100%" }}
 			animate={{ top: "0%" }}
-			exit={{ top: "100%" }}
+			exit={{ top: `calc(${menuBBox?.height}px + 250px)` }}
 			transition={{ duration: 0.2 }}
 			className="relative flex h-full w-2/3 flex-col justify-end"
 		>
@@ -90,9 +101,13 @@ export default function ExampleMenuPage() {
 				{/* Menu Body */}
 				<div
 					id="display-menu-body"
+					ref={menuRef}
 					className="z-50 flex flex-col gap-6 bg-primary p-[20px] sm:p-[30px] md:p-[50px] lg:p-[60px]"
 				>
-					<ul className="flex flex-col items-center gap-6">
+					<ul
+						className="flex flex-col items-center gap-6"
+						ref={itemsRef}
+					>
 						<AnimatePresence>
 							{items &&
 								items.map((item, i) => (

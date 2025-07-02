@@ -32,6 +32,10 @@ export default function EditItemPage({
 
 	if (!item) return <>Item not defined</>;
 
+	const handleInput = () => {
+		console.log("input handled");
+	};
+
 	return (
 		<motion.div
 			initial={{ top: "100%" }}
@@ -42,6 +46,7 @@ export default function EditItemPage({
 		>
 			<form
 				id="edit-item-form"
+				onInput={handleInput}
 				className="flex flex-col gap-2 bg-primary p-4 text-accent"
 			>
 				<div className="flex flex-row items-center justify-between">
