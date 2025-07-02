@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import ClientLottie from "./client-lottie";
 
 export function LoadingPage() {
+	console.log("Loading page rendered");
+
 	return (
 		<motion.main
 			className="flex h-screen w-screen flex-row items-center justify-center"

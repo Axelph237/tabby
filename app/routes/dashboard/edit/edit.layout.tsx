@@ -246,7 +246,12 @@ export default function EditLayout({
 			</div>
 			{/* Items tab */}
 			<div className="z-999 flex h-full w-full flex-row items-center justify-center overflow-scroll">
-				<AnimatedOutlet context={loaderData} />
+				<AnimatePresence mode="wait">
+					<AnimatedOutlet
+						key={location.pathname}
+						context={loaderData}
+					/>
+				</AnimatePresence>
 			</div>
 		</main>
 	);

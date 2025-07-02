@@ -3,7 +3,7 @@ import "./item.css";
 import type { ComponentProps } from "react";
 import { motion } from "motion/react";
 import { PenIcon } from "~/utils/components/icons";
-import { useOutletContext } from "react-router";
+import { Link, useOutletContext } from "react-router";
 
 const newItem: Item = {
 	id: -1,
@@ -33,19 +33,27 @@ export default function EditItemPage({
 	if (!item) return <>Item not defined</>;
 
 	return (
-		<div className="relative flex h-full w-2/3 flex-col justify-end">
+		<motion.div
+			initial={{ top: "100%" }}
+			animate={{ top: "0%" }}
+			exit={{ top: "100%" }}
+			transition={{ duration: 0.2 }}
+			className="relative flex h-full w-2/3 flex-col justify-end"
+		>
 			<form
 				id="edit-item-form"
 				className="flex flex-col gap-2 bg-primary p-4 text-accent"
 			>
-				<div className="flex flex-row justify-between">
-					<h1 className="font-red-hat-display text-2xl font-bold">Edit Item</h1>
-					<a
-						href="../menu"
-						className="btn px-4 py-2 text-primary"
+				<div className="flex flex-row items-center justify-between">
+					<h1 className="flex items-center justify-center font-dongle text-[64px] font-semibold text-accent">
+						Edit Item
+					</h1>
+					<Link
+						to="../menu"
+						className="btn h-fit px-4 py-2 text-primary opacity-60 hover:opacity-100"
 					>
 						Back
-					</a>
+					</Link>
 				</div>
 
 				<ItemInput
@@ -76,7 +84,7 @@ export default function EditItemPage({
 					defaultValue={item.basePrice}
 				/>
 			</form>
-		</div>
+		</motion.div>
 	);
 }
 

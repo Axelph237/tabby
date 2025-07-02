@@ -24,7 +24,7 @@ import {
 	TabbyLogo,
 } from "~/utils/components/icons";
 import "./menu.css";
-import { useOutletContext } from "react-router";
+import { Link, useOutletContext } from "react-router";
 
 export default function ExampleMenuPage() {
 	const { context } = useOutletContext() as { context: { menu: Menu } };
@@ -61,7 +61,13 @@ export default function ExampleMenuPage() {
 	};
 
 	return (
-		<div className="relative flex h-full w-2/3 flex-col justify-end">
+		<motion.div
+			initial={{ top: "100%" }}
+			animate={{ top: "0%" }}
+			exit={{ top: "100%" }}
+			transition={{ duration: 0.2 }}
+			className="relative flex h-full w-2/3 flex-col justify-end"
+		>
 			{/* Menu */}
 			<div
 				id="display-menu-container"
@@ -93,6 +99,7 @@ export default function ExampleMenuPage() {
 									<motion.div
 										initial={{ scale: 0 }}
 										animate={{ scale: 1 }}
+										transition={{ delay: 0.1 }}
 										className="size-full"
 										key={i}
 									>
@@ -109,7 +116,7 @@ export default function ExampleMenuPage() {
 					</button>
 				</div>
 			</div>
-		</div>
+		</motion.div>
 	);
 }
 
@@ -161,12 +168,12 @@ function ExampleMenuItem({ item }: { item: ItemWithOpts }) {
 
 				{/* Buttons */}
 				<div className="flex h-1/4 w-full items-start justify-center justify-evenly p-[5px] md:justify-center md:gap-[20px]">
-					<a
-						href={`./item/${item.id === -1 ? "new" : item.id}`}
+					<Link
+						to={`../item/${item.id}`}
 						className="btn size-full text-sm opacity-60 transition-all duration-150 hover:scale-105 hover:opacity-100 sm:text-lg"
 					>
 						<PenIcon className="icon-sm" />
-					</a>
+					</Link>
 				</div>
 			</div>
 		</div>

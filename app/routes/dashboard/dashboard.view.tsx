@@ -139,7 +139,7 @@ export default function DashboardPage({
 
 								<Link
 									className="flex cursor-pointer flex-row items-center gap-2 rounded-xl bg-secondary p-4 font-red-hat-text font-bold text-primary shadow-lg transition-all duration-200 hover:bg-secondary-dark"
-									to={`edit/menu/${menus[selectedIndex ?? 0].id}`}
+									to={`edit/${menus[selectedIndex ?? 0].id}/menu`}
 								>
 									<PenIcon className="icon-sm" />
 									Edit Menu
