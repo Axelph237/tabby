@@ -33,10 +33,13 @@ export default [
 		// Dashboard
 		route("/dashboard", "routes/dashboard/dashboard.layout.tsx", [
 			index("routes/dashboard/dashboard.view.tsx"),
-			route(
-				"edit/menu/:menuId",
-				"routes/dashboard/edit/menu/edit-menu.view.tsx",
-			),
+			// Edit page
+			route("edit/:menuId", "routes/dashboard/edit/edit.layout.tsx", [
+				// Display menu
+				route("menu", "routes/dashboard/edit/menu/menu.view.tsx"),
+				// Edit item on menu
+				route("item/:itemId", "routes/dashboard/edit/item/item.view.tsx"),
+			]),
 		]),
 	]),
 ] satisfies RouteConfig;

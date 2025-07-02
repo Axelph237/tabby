@@ -1,0 +1,4 @@
+#edit-item-form {
+	--corner-size: var(--border-radius-playful);
+	border-radius: var(--corner-size) var(--corner-size) 0 0;
+}

@@ -1,8 +1,8 @@
-import { useOutlet } from "react-router";
+import { useOutlet, type OutletProps } from "react-router";
 import { useState } from "react";
 
-export default function AnimatedOutlet() {
-	const o = useOutlet();
+export default function AnimatedOutlet(props: OutletProps) {
+	const o = useOutlet(props);
 	const [outlet] = useState(o);
 
 	return <>{outlet}</>;
