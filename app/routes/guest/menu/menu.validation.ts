@@ -1,11 +1,16 @@
-import { Type as t, type Static } from "@sinclair/typebox";
+import { Null, Type as t, type Static } from "@sinclair/typebox";
 import { uuidObj } from "~/utils/types/uuid";
 import { Nullable } from "~/utils/types/nullable";
+
+const timestamps = {
+	createdAt: Nullable(t.String()),
+	updatedAt: Nullable(t.String()),
+	deletedAt: Nullable(t.String()),
+};
 
 // DEPRECATED
 export const menuTObj = t.Object({
 	id: uuidObj,
-	createdAt: t.Date(),
 	createdBy: uuidObj,
 	name: t.String(),
 	style: t.Optional(
@@ -24,6 +29,7 @@ export const menuTObj = t.Object({
 			}),
 		),
 	),
+	...timestamps,
 });
 export type Menu = Static<typeof menuTObj>;
 
@@ -53,9 +59,7 @@ export const itemTObj = t.Object({
 	description: t.Optional(Nullable(t.String())),
 	imgUrl: t.Optional(Nullable(t.String({ format: "uri" }))),
 	basePrice: t.Integer(),
-	createdAt: Nullable(t.String()),
-	updatedAt: Nullable(t.String()),
-	deletedAt: Nullable(t.String()),
+	...timestamps,
 });
 export type Item = Static<typeof itemTObj>;
 
@@ -78,8 +82,8 @@ export const itemWithOptsTObj = t.Intersect([
 export type ItemWithOpts = Static<typeof itemWithOptsTObj>;
 
 export const sessionDetailsTObj = t.Object({
-	menuName: t.String(),
-	expiresAt: t.Date(),
-	items: t.Array(itemWithOptsTObj),
+	id: uuidObj,
+	expiresAt: Nullable(t.Date()),
+	menu: menuTObj,
 });
 export type SessionDetails = Static<typeof sessionDetailsTObj>;

@@ -3,11 +3,11 @@ import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/utils/components/icons";
 import { Link } from "react-router";
 import Cart, { type CartItem } from "~/utils/cart";
-import type {
-	ItemWithOpts,
-	SessionDetails,
+import {
+	type Menu,
+	type ItemWithOpts,
+	type SessionDetails,
 } from "~/routes/guest/menu/menu.validation";
-import { getSession } from "~/routes/guest/menu/menu.handler";
 import MenuItem from "~/routes/guest/menu/components/menu-item.component";
 import { motion, useScroll } from "framer-motion";
 
@@ -18,15 +18,28 @@ export default function MenuPage({
 }) {
 	const { scrollYProgress } = useScroll();
 	const STORAGE_KEY = `menu:${sessId}`;
-	const [menu, setMenu] = useState<ItemWithOpts[] | undefined>(undefined);
+	const [menu, setMenu] = useState<Menu | undefined>(undefined);
+	const [items, setItems] = useState<ItemWithOpts[] | undefined>(undefined);
 	const [cart, setCart] = useState<Cart | undefined>(undefined);
 	const [numLineItems, setNumLineItems] = useState<number>(0);
 
 	useEffect(() => {
 		// Get item types
-		getSession(sessId)
+		fetch(`/api/sessions/${sessId}`, {
+			method: "GET",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(items),
+		})
+			.then((res) => {
+				if (res.status === 200) return res.json();
+				throw new Error("Failed to find session.");
+			})
 			.then((sess: SessionDetails) => {
-				setMenu(sess.items);
+				console.log(sess);
+				setMenu(sess.menu);
 
 				// TODO update items in cart to mirror potential changes on menu
 				// i.e. price changes, options being removed, etc.
@@ -73,6 +86,22 @@ export default function MenuPage({
 		};
 	}, []);
 
+	useEffect(() => {
+		if (!menu) return;
+
+		fetch(`/api/items?${new URLSearchParams({ menuId: menu.id })}`, {
+			method: "GET",
+			credentials: "include",
+		})
+			.then((res) => {
+				if (res.status === 200) return res.json();
+				return undefined;
+			})
+			.then((items: ItemWithOpts[]) => {
+				setItems(items);
+			});
+	}, [menu]);
+
 	const createPebbleEffect = (dropIn: boolean) => {
 		const parent = document.getElementById("checkout-btn-container");
 		if (parent) {
@@ -103,7 +132,7 @@ export default function MenuPage({
 	};
 
 	const handleUpdate = (item: CartItem, addItem: boolean = true) => {
-		if (!cart || !menu) return;
+		if (!cart || !items) return;
 
 		if (addItem) cart.addItem(item);
 		else cart.removeItem(item);
@@ -181,8 +210,8 @@ export default function MenuPage({
 						className="z-50 bg-primary p-[20px] sm:p-[30px] md:p-[50px] lg:p-[60px]"
 					>
 						<ul className="flex flex-col items-center gap-10">
-							{menu &&
-								menu.map((item, i) => (
+							{items &&
+								items.map((item, i) => (
 									<Fragment key={i}>
 										<MenuItem
 											item={item}

@@ -24,10 +24,14 @@ import {
 	TabbyLogo,
 } from "~/utils/components/icons";
 import "./menu.css";
-import { Link, useOutletContext } from "react-router";
+import { Link } from "react-router";
 
-export default function ExampleMenuPage() {
-	const { context } = useOutletContext() as { context: { menu: Menu } };
+export default function ExampleMenuPage({
+	params,
+}: {
+	params: { menuId: string };
+}) {
+	const menuId = params.menuId;
 
 	const [items, setItems] = useState<ItemWithOpts[]>([]);
 	const [menuBBox, setMenuBBox] = useState<DOMRectReadOnly | undefined>(
@@ -37,7 +41,7 @@ export default function ExampleMenuPage() {
 	const itemsRef = useRef<HTMLUListElement>(null);
 
 	useEffect(() => {
-		fetch(`/api/items?${new URLSearchParams({ menuId: context.menu.id })}`)
+		fetch(`/api/items?${new URLSearchParams({ menuId })}`)
 			.then((res) => {
 				if (res.status === 200) return res.json();
 
@@ -184,7 +188,7 @@ function ExampleMenuItem({ item }: { item: ItemWithOpts }) {
 				{/* Buttons */}
 				<div className="flex h-1/4 w-full items-start justify-center justify-evenly p-[5px] md:justify-center md:gap-[20px]">
 					<Link
-						to={`../item/${item.id}`}
+						to={`../item/${item.id === -1 ? "new" : item.id}`}
 						className="btn size-full text-sm opacity-60 transition-all duration-150 hover:scale-105 hover:opacity-100 sm:text-lg"
 					>
 						<PenIcon className="icon-sm" />

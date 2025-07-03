@@ -103,7 +103,7 @@ export default function MenuItem({
 				<div className="flex h-1/4 w-full items-start justify-center justify-evenly p-[5px] md:justify-center md:gap-[20px]">
 					{
 						<button
-							className="btn size-full text-sm sm:text-lg"
+							className="btn z-9999 size-full text-sm sm:text-lg"
 							onClick={() => updateItem(true)}
 						>
 							Add

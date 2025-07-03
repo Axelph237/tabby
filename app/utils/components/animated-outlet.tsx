@@ -1,9 +1,13 @@
 import { useOutlet, type OutletProps } from "react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function AnimatedOutlet(props: OutletProps) {
+interface AnimatedOutletProps<T = any> extends OutletProps {
+	context?: T;
+}
+
+export default function AnimatedOutlet<T = any>(props: AnimatedOutletProps<T>) {
 	const o = useOutlet(props);
-	const [outlet] = useState(o);
+	const [outlet, setOutlet] = useState(o);
 
 	return <>{outlet}</>;
 }

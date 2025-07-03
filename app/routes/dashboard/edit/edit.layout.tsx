@@ -6,10 +6,20 @@ import {
 	type ComponentProps,
 	type JSX,
 } from "react";
-import type { Item, Menu } from "~/routes/guest/menu/menu.validation";
+import type {
+	Item,
+	ItemWithOpts,
+	Menu,
+} from "~/routes/guest/menu/menu.validation";
 import AnimatedOutlet from "~/utils/components/animated-outlet";
 import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
 import { CaretRightIcon, PenIcon, TabbyLogo } from "~/utils/components/icons";
+import QRCode from "react-qr-code";
+
+export interface EditPageOutletContext {
+	menu: [Menu, (data: Menu) => void];
+	items: [ItemWithOpts[], (data: ItemWithOpts[]) => void];
+}
 
 export async function clientLoader({ params }: { params: { menuId: string } }) {
 	console.log("Menu id:", params.menuId);
@@ -21,34 +31,15 @@ export async function clientLoader({ params }: { params: { menuId: string } }) {
 
 	if (menuRes.status !== 200) return undefined;
 
-	const menu = await menuRes.json();
-
-	const itemsRes = await fetch(
-		`/api/items?${new URLSearchParams({ menuId: params.menuId })}`,
-		{
-			method: "GET",
-			credentials: "include",
-		},
-	);
-
-	let items: Item[] | undefined;
-	if (itemsRes.status === 200) items = await itemsRes.json();
-
-	return {
-		menu,
-		items,
-	};
+	return menuRes.json();
 }
 
-export default function EditLayout({
-	loaderData,
-}: {
-	loaderData: { menu: Menu; items: Item[] | undefined } | undefined;
-}) {
+export default function EditLayout({ loaderData }: { loaderData: Menu }) {
 	if (!loaderData) return;
 
-	const [menuData, setMenuData] = useState<Menu>(loaderData.menu);
-	const [sessions, setSessions] = useState([]);
+	const [menuData, setMenuData] = useState<Menu>(loaderData);
+	const [sessions, setSessions] = useState<{ id: string }[]>([]);
+	const [qrCode, setQRCode] = useState<string | undefined>(undefined);
 
 	useEffect(() => {
 		fetch("/api/sessions?" + new URLSearchParams({ menuId: menuData.id }), {
@@ -129,6 +120,25 @@ export default function EditLayout({
 		if (res.status !== 200) throw new Error("Failed to submit form");
 
 		return await res.json();
+	};
+
+	const handleCreateSession = () => {
+		if (sessions && sessions.length > 0) return;
+
+		fetch(`/api/sessions`, {
+			method: "POST",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ menuId: menuData.id, expiresAt: null }),
+		})
+			.then((res) => {
+				if (res.status === 200) return res.json();
+				throw new Error("Failed to create session");
+			})
+			.then((data) => setSessions(data))
+			.catch((err) => console.log(err));
 	};
 
 	return (
@@ -236,21 +246,27 @@ export default function EditLayout({
 						line={{ strokeDasharray: "20", strokeWidth: "2" }}
 					/>
 					<p>hello</p>
-
-					{sessions && sessions.length > 0 ? (
-						<></>
-					) : (
-						<button className="btn px-4 py-2">Create Session</button>
-					)}
 				</form>
+
+				<button
+					onClick={handleCreateSession}
+					className={`btn px-4 ${sessions && sessions.length > 0 ? "py-4" : "py-2"}`}
+				>
+					{sessions && sessions.length > 0 ? (
+						<QRCode
+							value={`http://localhost:5173/guest/menu/${sessions[0].id}`}
+							bgColor="#eeebd8"
+							fgColor="#353938"
+						/>
+					) : (
+						"Create Session"
+					)}
+				</button>
 			</div>
 			{/* Items tab */}
 			<div className="z-999 flex h-full w-full flex-row items-center justify-center overflow-scroll">
 				<AnimatePresence mode="wait">
-					<AnimatedOutlet
-						key={location.pathname}
-						context={loaderData}
-					/>
+					<AnimatedOutlet key={location.pathname} />
 				</AnimatePresence>
 			</div>
 		</main>

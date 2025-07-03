@@ -1,11 +1,17 @@
-import type { Item } from "~/routes/guest/menu/menu.validation";
+import type { ItemWithOpts } from "~/routes/guest/menu/menu.validation";
 import "./item.css";
-import type { ComponentProps } from "react";
+import {
+	useEffect,
+	useRef,
+	useState,
+	type ComponentProps,
+	type FormEvent,
+} from "react";
 import { motion } from "motion/react";
-import { PenIcon } from "~/utils/components/icons";
-import { Link, useOutletContext } from "react-router";
+import { PenIcon, SaveIcon, TrashIcon } from "~/utils/components/icons";
+import { Link, redirect } from "react-router";
 
-const newItem: Item = {
+const newItem: ItemWithOpts = {
 	id: -1,
 	name: "Untitled Item",
 	description: undefined,
@@ -14,6 +20,7 @@ const newItem: Item = {
 	createdAt: null,
 	updatedAt: null,
 	deletedAt: null,
+	options: [],
 };
 
 export default function EditItemPage({
@@ -21,20 +28,74 @@ export default function EditItemPage({
 }: {
 	params: { itemId: string };
 }) {
-	const { context } = useOutletContext() as {
-		context: { items: Item[] | undefined };
-	};
+	const isNewItem = params.itemId === "new";
+	const [item, setItem] = useState<ItemWithOpts | undefined>(undefined);
+	const [saved, setSaved] = useState<boolean>(!isNewItem);
+	const formRef = useRef<HTMLFormElement>(null);
 
-	const item =
-		params.itemId == "new"
-			? newItem
-			: context.items?.find((v) => v.id == Number(params.itemId));
-
-	if (!item) return <>Item not defined</>;
+	useEffect(() => {
+		fetch(`/api/items/${params.itemId}`, {
+			method: "GET",
+			credentials: "include",
+		})
+			.then((res) => {
+				if (res.status === 200) return res.json();
+				return undefined;
+			})
+			.then((data) => setItem(data ?? newItem))
+			.catch((err) => console.error(err));
+	}, []);
 
 	const handleInput = () => {
 		console.log("input handled");
+		setSaved(false);
 	};
+
+	const handleSave = (e: FormEvent) => {
+		e.preventDefault();
+		setSaved(true);
+
+		const formData = new FormData(formRef.current!);
+		const name = formData.get("item-name");
+		const desc = formData.get("item-desc");
+		const imgUrl = formData.get("item-imgUrl");
+		const basePrice = Number(formData.get("item-basePrice") || 0);
+
+		let updatedItem = {
+			name,
+			imgUrl,
+			basePrice,
+			description: desc,
+		};
+
+		fetch(`/api/items${isNewItem ? "" : `/${params.itemId}`}`, {
+			method: isNewItem ? "POST" : "PUT",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(updatedItem),
+		})
+			.then((res) => {
+				if (res.status === 200) return res.json();
+				return undefined;
+			})
+			.then((data) => setItem(data))
+			.catch((err) => {
+				console.log(err);
+				setSaved(false);
+			});
+	};
+
+	const handleDelete = (e: FormEvent) => {
+		e.preventDefault();
+
+		fetch(`/api/items/${params.itemId}`);
+
+		redirect("../menu");
+	};
+
+	if (!item) return <></>;
 
 	return (
 		<motion.div
@@ -47,6 +108,7 @@ export default function EditItemPage({
 			<form
 				id="edit-item-form"
 				onInput={handleInput}
+				ref={formRef}
 				className="flex flex-col gap-2 bg-primary p-4 text-accent"
 			>
 				<div className="flex flex-row items-center justify-between">
@@ -55,7 +117,7 @@ export default function EditItemPage({
 					</h1>
 					<Link
 						to="../menu"
-						className="btn h-fit px-4 py-2 text-primary opacity-60 hover:opacity-100"
+						className="btn h-fit px-4 py-2 text-primary"
 					>
 						Back
 					</Link>
@@ -88,6 +150,29 @@ export default function EditItemPage({
 					name="item-basePrice"
 					defaultValue={item.basePrice}
 				/>
+
+				<div className="flex flex-row justify-between">
+					{saved ? (
+						<div className="w-fit justify-self-end rounded-xl bg-accent px-6 py-2 opacity-60">
+							<SaveIcon className="icon-sm opacity-0" />
+						</div>
+					) : (
+						<button
+							onClick={handleSave}
+							className="btn w-fit justify-self-end px-6 py-2 text-primary"
+						>
+							<SaveIcon className="icon-sm" />
+						</button>
+					)}
+					{!isNewItem && (
+						<button
+							className="btn px-6 py-2 text-primary hover:text-red-300"
+							onClick={handleDelete}
+						>
+							<TrashIcon className="icon-sm" />
+						</button>
+					)}
+				</div>
 			</form>
 		</motion.div>
 	);
