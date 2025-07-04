@@ -2,7 +2,7 @@ import "/app/routes/guest/menu/menu.css";
 import { Fragment, type HTMLProps, useEffect, useState } from "react";
 import { ReceiptIcon } from "~/utils/components/icons";
 import { Link } from "react-router";
-import Cart, { type CartItem } from "~/utils/cart";
+// import Cart, { type CartItem } from "~/utils/cart";
 import {
 	type Menu,
 	type ItemWithOpts,
@@ -10,6 +10,7 @@ import {
 } from "~/routes/guest/menu/menu.validation";
 import MenuItem from "~/routes/guest/menu/components/menu-item.component";
 import { motion, useScroll } from "framer-motion";
+import Cart from "./cart";
 
 export default function MenuPage({
 	params: { sessId },
@@ -45,14 +46,12 @@ export default function MenuPage({
 				// i.e. price changes, options being removed, etc.
 				const cartData = sessionStorage.getItem(STORAGE_KEY);
 				// Parse empty string if data is null; "" will fail isCart test
+
 				const parsedData = JSON.parse(cartData ?? "{}");
 
-				const newCart = Cart.isCart(parsedData)
-					? new Cart(parsedData)
-					: new Cart();
-
+				const newCart = new Cart(parsedData.items ? parsedData : undefined);
+				console.log("Generated cart from storage:", newCart);
 				setCart(newCart);
-				setNumLineItems(newCart.numLineItems);
 			})
 			.catch((err) => console.warn(err));
 
@@ -131,18 +130,17 @@ export default function MenuPage({
 		}
 	};
 
-	const handleUpdate = (item: CartItem, addItem: boolean = true) => {
+	const handleCartUpdate = (itemId: number, count: number) => {
 		if (!cart || !items) return;
 
-		if (addItem) cart.addItem(item);
-		else cart.removeItem(item);
-		setNumLineItems(cart.numLineItems);
+		cart.addItem(itemId, count);
+		console.log(cart.toObject());
 
 		// Update storage data
-		sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cart.toObject()));
+		sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cart?.toObject()));
 
 		// Visuals
-		createPebbleEffect(addItem);
+		createPebbleEffect(count > 0);
 	};
 
 	return (
@@ -214,9 +212,8 @@ export default function MenuPage({
 								items.map((item, i) => (
 									<Fragment key={i}>
 										<MenuItem
-											item={item}
-											itemChildren={cart?.findItemFamily(item.id) ?? []}
-											onUpdate={handleUpdate}
+											item={{ ...item, count: cart?.getItems()[item.id] ?? 0 }}
+											updateCart={handleCartUpdate}
 										/>
 									</Fragment>
 								))}

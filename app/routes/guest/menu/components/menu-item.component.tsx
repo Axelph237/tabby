@@ -4,29 +4,20 @@ import type { ItemWithOpts } from "~/routes/guest/menu/menu.validation";
 import type { CartItem } from "~/utils/cart";
 
 interface MenuItemProps extends MotionAdvancedProps {
-	item: ItemWithOpts;
-	itemChildren: CartItem[];
-	onUpdate: (item: CartItem, addItem: boolean) => void;
+	item: ItemWithOpts & { count: number };
+	updateCart: (itemId: number, count: number) => void;
 }
 
 export default function MenuItem({
 	item,
-	itemChildren,
-	onUpdate,
+	updateCart,
 	...props
 }: MenuItemProps) {
-	const [count, setCount] = useState(itemChildren.length);
-	const [clicked, setClicked] = useState(itemChildren.length > 0);
+	const [count, setCount] = useState(item.count);
+	const [clicked, setClicked] = useState(item.count > 0);
 
 	const [opened, setOpened] = useState(false);
 	const [options, setOptions] = useState(undefined);
-
-	useEffect(() => {
-		let initCount = 0;
-		for (const item of itemChildren) initCount += item.count;
-
-		setCount(initCount);
-	}, []);
 
 	useEffect(() => {
 		if (opened && !options) {
@@ -34,34 +25,19 @@ export default function MenuItem({
 		}
 	}, [opened]);
 
-	const updateItem = (addItem: boolean = true) => {
+	const addItem = (n: number = 1) => {
 		if (!clicked && count == 0) {
 			setClicked(true);
 			setOpened(true);
-		} else if (!addItem && count <= 1) {
+		} else if (n <= 0 && count <= 1) {
 			setClicked(false);
 			setOpened(false);
 		}
 
-		if (!addItem && count <= 0) return;
+		if (n <= 0 && count <= 0) return;
 
-		setCount(addItem ? count + 1 : count - 1);
-
-		// Call parent function
-		onUpdate(
-			{
-				// Inherited props
-				id: item.id,
-				name: item.name,
-				description: item.description,
-				img_url: item.imgUrl,
-				// New props
-				unit_price: item.basePrice,
-				count: 1,
-				selections: [],
-			},
-			addItem,
-		);
+		updateCart(item.id, n);
+		setCount(count + n);
 	};
 
 	return (
@@ -104,7 +80,7 @@ export default function MenuItem({
 					{
 						<button
 							className="btn z-9999 size-full text-sm sm:text-lg"
-							onClick={() => updateItem(true)}
+							onClick={() => addItem(1)}
 						>
 							Add
 						</button>
