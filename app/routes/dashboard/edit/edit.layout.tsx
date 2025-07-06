@@ -11,9 +11,9 @@ import type {
 	ItemWithOpts,
 	Menu,
 } from "~/routes/guest/menu/menu.validation";
-import AnimatedOutlet from "~/utils/components/animated-outlet";
-import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
-import { CaretRightIcon, PenIcon, TabbyLogo } from "~/utils/components/icons";
+import AnimatedOutlet from "~/lib/components/animated-outlet";
+import FullWidthDottedLine from "~/lib/components/full-width-dotted-line";
+import { CaretRightIcon, PenIcon, TabbyLogo } from "~/lib/components/icons";
 import QRCode from "react-qr-code";
 
 export interface EditPageOutletContext {

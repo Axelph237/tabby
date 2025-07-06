@@ -1,6 +1,6 @@
 import { useLocation } from "react-router";
 import { AnimatePresence } from "framer-motion";
-import AnimatedOutlet from "~/utils/components/animated-outlet";
+import AnimatedOutlet from "~/lib/components/animated-outlet";
 
 export default function GuestLayout() {
 	const location = useLocation();

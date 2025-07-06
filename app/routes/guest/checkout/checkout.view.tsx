@@ -1,16 +1,16 @@
-import { CaretDownIcon, TabbyLogo } from "~/utils/components/icons";
+import { CaretDownIcon, TabbyLogo } from "~/lib/components/icons";
 import { type ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
 import { requestOrder } from "~/routes/guest/checkout/checkout.handler";
 import Cart from "../menu/cart";
 import { motion } from "motion/react";
-import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
+import FullWidthDottedLine from "~/lib/components/full-width-dotted-line";
 import {
 	type Menu,
 	type Item,
 	type SessionDetails,
 	type ItemWithOpts,
 } from "../menu/menu.validation";
-import FullWidthLine from "~/utils/components/full-width-line";
+import FullWidthLine from "~/lib/components/full-width-line";
 import { Link } from "react-router";
 
 export default function CheckoutPage({

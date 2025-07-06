@@ -3,7 +3,7 @@ import {
 	FireIcon,
 	SendIcon,
 	TabbyLogo,
-} from "~/utils/components/icons";
+} from "~/lib/components/icons";
 import "../../../public/styles/status.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";

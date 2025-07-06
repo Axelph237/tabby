@@ -1,12 +1,12 @@
 import "/app/routes/guest/menu/menu.css";
 import { Outlet, useNavigate, useSearchParams } from "react-router";
-import { TabbyLogo } from "~/utils/components/icons";
+import { TabbyLogo } from "~/lib/components/icons";
 import { useEffect, useRef, useState } from "react";
 import Auth from "~/api/user.handler";
 import "./auth.css";
 import checkmarkLottie from "../../../public/lotties/checkmark.json";
 import type { LottiePlayer } from "lottie-web";
-import ClientLottie from "~/utils/components/client-lottie";
+import ClientLottie from "~/lib/components/client-lottie";
 
 export default function AuthPage() {
 	const [loggedIn, setLoggedIn] = useState<boolean>(false);

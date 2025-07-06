@@ -8,7 +8,7 @@ import {
 	type FormEvent,
 } from "react";
 import { motion } from "motion/react";
-import { PenIcon, SaveIcon, TrashIcon } from "~/utils/components/icons";
+import { PenIcon, SaveIcon, TrashIcon } from "~/lib/components/icons";
 import { Link, useNavigate } from "react-router";
 
 const newItem: ItemWithOpts = {

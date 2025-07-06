@@ -9,8 +9,8 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import Svgfilters from "~/utils/components/svgfilters";
-import { LoadingPage } from "~/utils/components/loading-page";
+import Svgfilters from "~/lib/components/svg-filters";
+import { LoadingPage } from "~/lib/components/loading-page";
 import { AnimatePresence } from "framer-motion";
 
 export const links: Route.LinksFunction = () => [

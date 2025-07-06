@@ -6,8 +6,8 @@ import {
 	PlusIcon,
 	RightArrowIcon,
 	TabbyLogo,
-} from "~/utils/components/icons";
-import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
+} from "~/lib/components/icons";
+import FullWidthDottedLine from "~/lib/components/full-width-dotted-line";
 import { motion, AnimatePresence } from "framer-motion";
 import Dashboard from "./dashboard.handler";
 import { Link, Outlet, useOutletContext } from "react-router";

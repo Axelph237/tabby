@@ -4,9 +4,9 @@ import {
 	FireIcon,
 	SendIcon,
 	TabbyLogo,
-} from "~/utils/components/icons";
+} from "~/lib/components/icons";
 import checkmarkLottie from "../../../public/lotties/checkmark.json";
-import ClientLottie from "~/utils/components/client-lottie";
+import ClientLottie from "~/lib/components/client-lottie";
 
 export default function QueuePage() {
 	return (

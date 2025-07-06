@@ -29,7 +29,7 @@ export default [
 	]),
 
 	// Protected routes
-	layout("utils/layouts/authenticated-layout.tsx", [
+	layout("lib/components/authenticated-route.layout.tsx", [
 		// Dashboard
 		route("/dashboard", "routes/dashboard/dashboard.layout.tsx", [
 			index("routes/dashboard/dashboard.view.tsx"),

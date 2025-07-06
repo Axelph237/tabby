@@ -13,7 +13,7 @@ import type {
 	ItemWithOpts,
 	Menu,
 } from "~/routes/guest/menu/menu.validation";
-import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
+import FullWidthDottedLine from "~/lib/components/full-width-dotted-line";
 import {
 	CaretRightIcon,
 	ImgIcon,
@@ -22,7 +22,7 @@ import {
 	SaveIcon,
 	SendIcon,
 	TabbyLogo,
-} from "~/utils/components/icons";
+} from "~/lib/components/icons";
 import "./menu.css";
 import { Link } from "react-router";
 

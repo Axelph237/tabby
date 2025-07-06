@@ -1,7 +1,7 @@
 import { type Route } from "../../.react-router/types/app/+types/root";
 // import logoDark from "../../public/react-router/logo-dark.svg";
 // import logoLight from "../../public/react-router/logo-light.svg";
-import { PlayIcon, TabbyLogo } from "~/utils/components/icons";
+import { PlayIcon, TabbyLogo } from "~/lib/components/icons";
 import { useNavigate } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
