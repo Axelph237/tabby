@@ -17,7 +17,6 @@ export default function MenuPage({
 }: {
 	params: { sessId: string };
 }) {
-	const { scrollYProgress } = useScroll();
 	const STORAGE_KEY = `menu:${sessId}`;
 	const [menu, setMenu] = useState<Menu | undefined>(undefined);
 	const [items, setItems] = useState<ItemWithOpts[] | undefined>(undefined);
@@ -42,16 +41,8 @@ export default function MenuPage({
 				console.log(sess);
 				setMenu(sess.menu);
 
-				// TODO update items in cart to mirror potential changes on menu
-				// i.e. price changes, options being removed, etc.
-				const cartData = sessionStorage.getItem(STORAGE_KEY);
-				// Parse empty string if data is null; "" will fail isCart test
-
-				const parsedData = JSON.parse(cartData ?? "{}");
-
-				const newCart = new Cart(parsedData.items ? parsedData : undefined);
-				console.log("Generated cart from storage:", newCart);
-				setCart(newCart);
+				const savedCart = Cart.get(STORAGE_KEY);
+				setCart(savedCart);
 			})
 			.catch((err) => console.warn(err));
 
@@ -101,8 +92,22 @@ export default function MenuPage({
 			});
 	}, [menu]);
 
+	useEffect(() => {
+		if (cart && items) {
+			// Validate cart entries
+			cart.validateEntries(items);
+			// Save cart to storage
+			Cart.save(STORAGE_KEY, cart);
+
+			setNumLineItems(cart.getNumItems());
+		}
+	}, [cart, items]);
+
 	const createPebbleEffect = (dropIn: boolean) => {
+		console.log("Creating pebble effect");
+
 		const parent = document.getElementById("checkout-btn-container");
+		console.log("Checkout parent", parent);
 		if (parent) {
 			const parentRect = parent.getBoundingClientRect();
 			const pebble = document.createElement("div");
@@ -134,11 +139,11 @@ export default function MenuPage({
 		if (!cart || !items) return;
 
 		cart.addItem(itemId, count);
-		console.log(cart.toObject());
 
 		// Update storage data
-		sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cart?.toObject()));
+		Cart.save(STORAGE_KEY, cart);
 
+		setNumLineItems(cart.getNumItems());
 		// Visuals
 		createPebbleEffect(count > 0);
 	};
@@ -148,39 +153,36 @@ export default function MenuPage({
 			id="menu-page-container"
 			className="relative h-screen w-screen"
 			key="menu-page-container"
+			initial={{ top: "-3000px", opacity: 0 }}
+			animate={{ top: "0px", opacity: 1 }}
 			exit={{ top: "-3000px", opacity: 0 }}
 		>
 			<div className="fixed h-1/2 w-full bg-secondary lg:h-1/2">
-				{/*<motion.img*/}
-				{/*	id="order-page-img"*/}
-				{/*	src="/test-menu-img.jpg"*/}
-				{/*	alt="restaurant"*/}
-				{/*	className="h-full w-full object-cover"*/}
-				{/*	style={{*/}
-				{/*		scale: scrollYProgress*/}
-				{/*	}}*/}
-				{/*/>*/}
+				<motion.img
+					id="order-page-img"
+					src={menu?.style?.backgroundImg}
+					alt="restaurant"
+					className="h-full w-full object-cover"
+				/>
 			</div>
 
-			{numLineItems >= 1 && (
-				<Link
-					to={`/guest/checkout/${sessId}`}
-					id="checkout-btn-container"
-					className="gooey fixed bottom-10 left-10 z-[9999]"
-					viewTransition
+			<Link
+				to={`/guest/checkout/${sessId}`}
+				id="checkout-btn-container"
+				className={`${numLineItems < 1 && "pointer-events-none opacity-0"} gooey fixed bottom-10 left-10 z-[9999]`}
+				viewTransition
+			>
+				<button
+					id="checkout-button"
+					className="flex cursor-pointer flex-row gap-2 bg-accent px-6 py-4 font-bold transition-all duration-200 hover:text-secondary"
 				>
-					<button
-						id="checkout-button"
-						className="flex cursor-pointer flex-row gap-2 bg-accent px-6 py-4 font-bold transition-all duration-200 hover:text-secondary"
-					>
-						<ReceiptIcon className="icon-sm" />
-						<span className="hidden md:block">Checkout</span>
-						<span className={`${numLineItems <= 0 && "hidden"}`}>
-							({numLineItems})
-						</span>
-					</button>
-				</Link>
-			)}
+					<ReceiptIcon className="icon-sm" />
+					<span className="hidden md:block">Checkout</span>
+					<span className={`${numLineItems <= 0 && "hidden"}`}>
+						({numLineItems})
+					</span>
+				</button>
+			</Link>
 
 			<div className="relative flex h-full flex-col justify-end">
 				{/* Menu */}

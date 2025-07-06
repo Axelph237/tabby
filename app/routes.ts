@@ -22,7 +22,7 @@ export default [
 		// Menu page
 		route("menu/:sessId", "routes/guest/menu/menu.view.tsx"),
 		// Checkout page
-		route("checkout/:menuId", "routes/guest/checkout/checkout.view.tsx"),
+		route("checkout/:sessId", "routes/guest/checkout/checkout.view.tsx"),
 		// Status page
 		route("order/status", "routes/guest/status.tsx"),
 		route("order/ready", "routes/guest/ready.tsx"),

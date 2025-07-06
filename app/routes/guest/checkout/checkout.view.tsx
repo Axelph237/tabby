@@ -1,28 +1,71 @@
-import { TabbyLogo } from "~/utils/components/icons";
+import { CaretDownIcon, TabbyLogo } from "~/utils/components/icons";
 import { type ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
-import Cart, { type CartItem } from "~/utils/cart";
 import { requestOrder } from "~/routes/guest/checkout/checkout.handler";
+import Cart from "../menu/cart";
 import { motion } from "motion/react";
 import FullWidthDottedLine from "~/utils/components/full-width-dotted-line";
+import {
+	type Menu,
+	type Item,
+	type SessionDetails,
+	type ItemWithOpts,
+} from "../menu/menu.validation";
+import FullWidthLine from "~/utils/components/full-width-line";
+import { Link } from "react-router";
 
 export default function CheckoutPage({
-	params: { menuId },
+	params: { sessId },
 }: {
-	params: { menuId: string };
+	params: { sessId: string };
 }) {
-	const STORAGE_KEY = `menu:${menuId}`;
+	const STORAGE_KEY = `menu:${sessId}`;
 	const [name, setName] = useState("");
 	const [cart, setCart] = useState<Cart | undefined>(undefined);
+	const [menu, setMenu] = useState<Menu | undefined>(undefined);
+	const [checkoutItems, setCheckoutItems] = useState<
+		(ItemWithOpts & { count: number })[] | undefined
+	>([]);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
-		const sessionData = sessionStorage.getItem(STORAGE_KEY);
-		const parsedData = JSON.parse(sessionData ?? "{}");
+		// Get saved cart data
+		const savedCart = Cart.get(STORAGE_KEY);
+		console.log("Cart:", savedCart);
+		setCart(savedCart);
 
-		if (Cart.isCart(parsedData))
-			setCart(new Cart(parsedData)); // No cart data found
-		else setCart(new Cart());
+		fetch(`/api/sessions/${sessId}`, {
+			method: "GET",
+			credentials: "include",
+		})
+			.then((res) => {
+				if (res.status === 200) return res.json();
+				throw new Error("Failed to get session.");
+			})
+			.then((sess: SessionDetails) => setMenu(sess.menu))
+			.catch((err) => console.log(err));
 	}, []);
+
+	useEffect(() => {
+		if (!menu || !cart) return;
+
+		fetch(`/api/items?${new URLSearchParams({ menuId: menu.id })}`, {
+			method: "GET",
+			credentials: "include",
+		})
+			.then((res) => {
+				if (res.status === 200) return res.json();
+				return undefined;
+			})
+			.then((items: ItemWithOpts[]) => {
+				const checkout: (ItemWithOpts & { count: number })[] = [];
+				for (const i of items) {
+					if (cart.getItems()[i.id])
+						checkout.push({ ...i, count: cart.getItems()[i.id] });
+				}
+				setCheckoutItems(checkout);
+			})
+			.catch((err) => console.error(err));
+	}, [menu]);
 
 	const handleNameInput = (e: ChangeEvent<HTMLInputElement>) => {
 		const text = (inputRef.current! as HTMLInputElement).value;
@@ -40,10 +83,6 @@ export default function CheckoutPage({
 			console.log("Please enter valid name.");
 			return;
 		}
-
-		requestOrder(menuId, guestName, cart)
-			.then((res) => console.log("Created order:", res))
-			.catch((err) => console.log(err));
 	};
 
 	return (
@@ -52,6 +91,7 @@ export default function CheckoutPage({
 			className="relative flex h-fit min-h-screen flex-col items-center justify-start gap-[25px] bg-primary px-[20px] text-accent"
 			initial={{ top: "3000px", opacity: 0 }}
 			animate={{ top: 0, opacity: 1 }}
+			exit={{ top: "3000px", opacity: 0 }}
 		>
 			{/* header */}
 			<div
@@ -61,6 +101,19 @@ export default function CheckoutPage({
 				<h1 className="font-dongle text-[64px]">Tabby</h1>
 				<TabbyLogo className="h-26 w-26" />
 			</div>
+			{/* back button */}
+			<Link
+				to={`../menu/${sessId}`}
+				className="flex w-1/2 cursor-pointer flex-row gap-6 transition-all duration-150 hover:scale-105"
+			>
+				<FullWidthLine />
+				<span className="w-fit font-medium text-nowrap">Back To</span>
+				<div className="rounded-full bg-accent p-1 text-primary">
+					<CaretDownIcon className="icon-sm rotate-180" />
+				</div>
+				<span className="font-medium">Menu</span>
+				<FullWidthLine />
+			</Link>
 			{/* body */}
 			<div
 				id="checkout-body"
@@ -74,8 +127,8 @@ export default function CheckoutPage({
 				<FullWidthDottedLine />
 
 				<ul className="flex flex-col gap-[10px] font-dongle text-[36px] text-primary">
-					{cart &&
-						cart.items.map((item, i) => (
+					{checkoutItems &&
+						checkoutItems.map((item, i) => (
 							<Fragment key={i}>
 								<CheckoutItem item={item} />
 							</Fragment>
@@ -86,7 +139,15 @@ export default function CheckoutPage({
 
 				<p className="flex flex-row justify-between">
 					<span>TOTAL</span>
-					<span>${((cart?.totalCost ?? 0) / 100).toFixed(2)}</span>
+					<span>
+						$
+						{(
+							(checkoutItems?.reduce(
+								(a: number, curr) => a + curr.basePrice * curr.count,
+								0,
+							) ?? 0) / 100
+						).toFixed(2)}
+					</span>
 				</p>
 			</div>
 
@@ -123,12 +184,12 @@ export default function CheckoutPage({
 	);
 }
 
-function CheckoutItem({ item }: { item: CartItem }) {
+function CheckoutItem({ item }: { item: ItemWithOpts & { count: number } }) {
 	return (
 		<div className="layered h-[64px] w-full items-center justify-center overflow-hidden rounded-2xl bg-secondary">
-			{item.img_url && (
+			{item.imgUrl && (
 				<img
-					src={item.img_url}
+					src={item.imgUrl}
 					alt={item.name}
 					className="top-0 left-0 aspect-auto w-[120%] object-cover opacity-[0.2] blur-lg"
 				/>
@@ -137,7 +198,8 @@ function CheckoutItem({ item }: { item: CartItem }) {
 				<span>
 					{item.count} {item.name}
 				</span>
-				<span>${((item.count * item.unit_price) / 100).toFixed(2)}</span>
+				<span>${((item.count * item.basePrice) / 100).toFixed(2)}</span>{" "}
+				{/* TODO fix base price when adding selections */}
 			</p>
 		</div>
 	);

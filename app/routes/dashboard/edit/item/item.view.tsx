@@ -9,7 +9,7 @@ import {
 } from "react";
 import { motion } from "motion/react";
 import { PenIcon, SaveIcon, TrashIcon } from "~/utils/components/icons";
-import { Link, redirect } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 const newItem: ItemWithOpts = {
 	id: -1,
@@ -28,22 +28,27 @@ export default function EditItemPage({
 }: {
 	params: { itemId: string };
 }) {
-	const isNewItem = params.itemId === "new";
+	const isNewItem = params.itemId == "new";
+	const navigate = useNavigate();
 	const [item, setItem] = useState<ItemWithOpts | undefined>(undefined);
 	const [saved, setSaved] = useState<boolean>(!isNewItem);
 	const formRef = useRef<HTMLFormElement>(null);
 
 	useEffect(() => {
-		fetch(`/api/items/${params.itemId}`, {
-			method: "GET",
-			credentials: "include",
-		})
-			.then((res) => {
-				if (res.status === 200) return res.json();
-				return undefined;
+		if (isNewItem) {
+			setItem(newItem);
+		} else {
+			fetch(`/api/items/${params.itemId}`, {
+				method: "GET",
+				credentials: "include",
 			})
-			.then((data) => setItem(data ?? newItem))
-			.catch((err) => console.error(err));
+				.then((res) => {
+					if (res.status === 200) return res.json();
+					return undefined;
+				})
+				.then((data) => setItem(data ?? newItem))
+				.catch((err) => console.error(err));
+		}
 	}, []);
 
 	const handleInput = () => {
@@ -90,9 +95,15 @@ export default function EditItemPage({
 	const handleDelete = (e: FormEvent) => {
 		e.preventDefault();
 
-		fetch(`/api/items/${params.itemId}`);
-
-		redirect("../menu");
+		fetch(`/api/items/${params.itemId}`, {
+			method: "DELETE",
+			credentials: "include",
+		})
+			.then((res) => {
+				if (res.status === 200) return navigate("../menu");
+				throw new Error("Failed to delete item.");
+			})
+			.catch((err) => console.error(err));
 	};
 
 	if (!item) return <></>;
