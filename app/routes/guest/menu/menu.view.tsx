@@ -23,6 +23,7 @@ export default function MenuPage({
 	const [cart, setCart] = useState<Cart | undefined>(undefined);
 	const [numLineItems, setNumLineItems] = useState<number>(0);
 
+	// Load menu data on component mount, optimistic loading for guests
 	useEffect(() => {
 		// Get item types
 		fetch(`/api/sessions/${sessId}`, {
@@ -39,7 +40,10 @@ export default function MenuPage({
 			})
 			.then((sess: SessionDetails) => {
 				console.log(sess);
-				setMenu(sess.menu);
+				const { items, ...menu } = sess.menu;
+
+				setMenu(menu);
+				setItems(items);
 
 				const savedCart = Cart.get(STORAGE_KEY);
 				setCart(savedCart);
@@ -76,22 +80,24 @@ export default function MenuPage({
 		};
 	}, []);
 
-	useEffect(() => {
-		if (!menu) return;
+	// useEffect(() => {
+	// 	if (!menu) return;
 
-		fetch(`/api/items?${new URLSearchParams({ menuId: menu.id })}`, {
-			method: "GET",
-			credentials: "include",
-		})
-			.then((res) => {
-				if (res.status === 200) return res.json();
-				return undefined;
-			})
-			.then((items: ItemWithOpts[]) => {
-				setItems(items);
-			});
-	}, [menu]);
+	// 	fetch(`/api/items?${new URLSearchParams({ menuId: menu.id })}`, {
+	// 		method: "GET",
+	// 		credentials: "include",
+	// 	})
+	// 		.then((res) => {
+	// 			if (res.status === 200) return res.json();
+	// 			return undefined;
+	// 		})
+	// 		.then((items: ItemWithOpts[]) => {
+	// 			setItems(items);
+	// 		});
+	// }, [menu]);
 
+	// Validate cart when items have been loaded
+	// Ensures that items that have been removed from the menu are removed from the cart
 	useEffect(() => {
 		if (cart && items) {
 			// Validate cart entries

@@ -84,6 +84,11 @@ export type ItemWithOpts = Static<typeof itemWithOptsTObj>;
 export const sessionDetailsTObj = t.Object({
 	id: uuidObj,
 	expiresAt: Nullable(t.Date()),
-	menu: menuTObj,
+	menu: t.Intersect([
+		menuTObj,
+		t.Object({
+			items: t.Array(itemWithOptsTObj),
+		}),
+	]),
 });
 export type SessionDetails = Static<typeof sessionDetailsTObj>;

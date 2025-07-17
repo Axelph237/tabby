@@ -1,6 +1,5 @@
 import { CaretDownIcon, TabbyLogo } from "~/lib/components/icons";
 import { type ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
-import { requestOrder } from "~/routes/guest/checkout/checkout.handler";
 import Cart from "../menu/cart";
 import { motion } from "motion/react";
 import FullWidthDottedLine from "~/lib/components/full-width-dotted-line";
@@ -27,11 +26,17 @@ export default function CheckoutPage({
 	>([]);
 	const inputRef = useRef<HTMLInputElement>(null);
 
+	// Load cart on component mount
 	useEffect(() => {
 		// Get saved cart data
 		const savedCart = Cart.get(STORAGE_KEY);
-		console.log("Cart:", savedCart);
+		// console.log("Cart:", savedCart);
 		setCart(savedCart);
+	}, []);
+
+	// Verify cart data to current menu on cart load
+	useEffect(() => {
+		if (!cart) return;
 
 		fetch(`/api/sessions/${sessId}`, {
 			method: "GET",
@@ -41,22 +46,12 @@ export default function CheckoutPage({
 				if (res.status === 200) return res.json();
 				throw new Error("Failed to get session.");
 			})
-			.then((sess: SessionDetails) => setMenu(sess.menu))
-			.catch((err) => console.log(err));
-	}, []);
+			.then((sess: SessionDetails) => {
+				// console.log(sess);
+				const { items, ...menu } = sess.menu;
 
-	useEffect(() => {
-		if (!menu || !cart) return;
+				setMenu(menu);
 
-		fetch(`/api/items?${new URLSearchParams({ menuId: menu.id })}`, {
-			method: "GET",
-			credentials: "include",
-		})
-			.then((res) => {
-				if (res.status === 200) return res.json();
-				return undefined;
-			})
-			.then((items: ItemWithOpts[]) => {
 				const checkout: (ItemWithOpts & { count: number })[] = [];
 				for (const i of items) {
 					if (cart.getItems()[i.id])
@@ -64,8 +59,30 @@ export default function CheckoutPage({
 				}
 				setCheckoutItems(checkout);
 			})
-			.catch((err) => console.error(err));
-	}, [menu]);
+			.catch((err) => console.log(err));
+	}, [cart]);
+
+	// useEffect(() => {
+	// 	if (!menu || !cart) return;
+
+	// 	fetch(`/api/items?${new URLSearchParams({ menuId: menu.id })}`, {
+	// 		method: "GET",
+	// 		credentials: "include",
+	// 	})
+	// 		.then((res) => {
+	// 			if (res.status === 200) return res.json();
+	// 			return undefined;
+	// 		})
+	// 		.then((items: ItemWithOpts[]) => {
+	// 			const checkout: (ItemWithOpts & { count: number })[] = [];
+	// 			for (const i of items) {
+	// 				if (cart.getItems()[i.id])
+	// 					checkout.push({ ...i, count: cart.getItems()[i.id] });
+	// 			}
+	// 			setCheckoutItems(checkout);
+	// 		})
+	// 		.catch((err) => console.error(err));
+	// }, [menu]);
 
 	const handleNameInput = (e: ChangeEvent<HTMLInputElement>) => {
 		const text = (inputRef.current! as HTMLInputElement).value;
@@ -186,7 +203,12 @@ export default function CheckoutPage({
 
 function CheckoutItem({ item }: { item: ItemWithOpts & { count: number } }) {
 	return (
-		<div className="layered h-[64px] w-full items-center justify-center overflow-hidden rounded-2xl bg-secondary">
+		<motion.div
+			initial={{ opacity: 0, scale: 0, left: "-100%" }}
+			animate={{ opacity: 1, scale: 1, left: "0px" }}
+			transition={{ delay: 0.1 }}
+			className="layered relative h-[64px] w-full items-center justify-center overflow-hidden rounded-2xl bg-secondary"
+		>
 			{item.imgUrl && (
 				<img
 					src={item.imgUrl}
@@ -201,6 +223,6 @@ function CheckoutItem({ item }: { item: ItemWithOpts & { count: number } }) {
 				<span>${((item.count * item.basePrice) / 100).toFixed(2)}</span>{" "}
 				{/* TODO fix base price when adding selections */}
 			</p>
-		</div>
+		</motion.div>
 	);
 }

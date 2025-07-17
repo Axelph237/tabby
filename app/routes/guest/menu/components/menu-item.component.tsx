@@ -41,7 +41,10 @@ export default function MenuItem({
 	};
 
 	return (
-		<div
+		<motion.div
+			initial={{ opacity: 0, scale: 0 }}
+			animate={{ opacity: 1, scale: 1 }}
+			transition={{ delay: 0.15 }}
 			className="item-container relative flex h-[200px] w-full flex-row"
 			{...props}
 		>
@@ -87,6 +90,6 @@ export default function MenuItem({
 					}
 				</div>
 			</div>
-		</div>
+		</motion.div>
 	);
 }
