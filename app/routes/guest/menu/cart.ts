@@ -52,7 +52,7 @@ export default class Cart {
 
 	removeItem = (id: ItemId) => delete this.getItems()[id];
 
-	toObject = () => ({ items: this.getItems() });
+	// toObject = () => ({ items: this.getItems() });
 
 	validateEntries = (validItems: Item[]) => {
 		const verifiedItems: Record<ItemId, TLineItem> = {};
@@ -68,6 +68,20 @@ export default class Cart {
 		this.setItems(verifiedItems);
 
 		return this;
+	};
+
+	/**
+	 * Returns an array of items with their ids, counts, and differentiated by their selections.
+	 */
+	toUnfoldedArray = () => {
+		const arr = [];
+		for (const id in this.getItems())
+			arr.push({
+				id,
+				count: this.getItems()[id],
+			});
+
+		return arr;
 	};
 
 	static save = (key: string, cart: Cart) =>

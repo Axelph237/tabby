@@ -9,7 +9,7 @@ import {
 	type SessionDetails,
 } from "~/routes/guest/menu/menu.validation";
 import MenuItem from "~/routes/guest/menu/components/menu-item.component";
-import { motion, useScroll } from "framer-motion";
+import { AnimatePresence, motion, useScroll } from "framer-motion";
 import Cart from "./cart";
 
 export default function MenuPage({
@@ -141,17 +141,31 @@ export default function MenuPage({
 		}
 	};
 
-	const handleCartUpdate = (itemId: number, count: number) => {
+	const handleCartUpdate = (
+		itemId: number,
+		count: number,
+		mode: string = "add",
+	) => {
 		if (!cart || !items) return;
 
-		cart.addItem(itemId, count);
+		if (mode === "add") {
+			cart.addItem(itemId, count);
+			// Visuals
+			createPebbleEffect(count > 0);
+		} else if (mode === "set") {
+			const prevCount = cart.getItems()[itemId];
+
+			cart.setItem(itemId, count);
+			// Visuals
+			if (cart.getNumItems()) {
+				createPebbleEffect(count > prevCount);
+			}
+		}
 
 		// Update storage data
 		Cart.save(STORAGE_KEY, cart);
 
 		setNumLineItems(cart.getNumItems());
-		// Visuals
-		createPebbleEffect(count > 0);
 	};
 
 	return (
@@ -175,19 +189,22 @@ export default function MenuPage({
 			<Link
 				to={`/guest/checkout/${sessId}`}
 				id="checkout-btn-container"
-				className={`${numLineItems < 1 && "pointer-events-none opacity-0"} gooey fixed bottom-10 left-10 z-[9999]`}
+				className={`${numLineItems < 1 && "pointer-events-none"} gooey fixed bottom-10 left-10 z-[9999] min-w-[100px] md:min-w-[200px]`}
 				viewTransition
 			>
-				<button
-					id="checkout-button"
-					className="flex cursor-pointer flex-row gap-2 bg-accent px-6 py-4 font-bold transition-all duration-200 hover:text-secondary"
-				>
-					<ReceiptIcon className="icon-sm" />
-					<span className="hidden md:block">Checkout</span>
-					<span className={`${numLineItems <= 0 && "hidden"}`}>
-						({numLineItems})
-					</span>
-				</button>
+				{numLineItems >= 1 && (
+					<motion.button
+						initial={{ scale: 0 }}
+						animate={{ scale: 1 }}
+						transition={{ duration: 0.1, ease: "easeInOut" }}
+						id="checkout-button"
+						className="relative flex w-full cursor-pointer flex-row gap-2 bg-accent px-6 py-4 font-bold transition-all duration-200 hover:text-secondary"
+					>
+						<ReceiptIcon className="icon-sm" />
+						<span className="hidden md:block">Checkout</span>
+						<span>({numLineItems})</span>
+					</motion.button>
+				)}
 			</Link>
 
 			<div className="relative flex h-full flex-col justify-end">

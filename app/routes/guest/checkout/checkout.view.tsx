@@ -100,6 +100,12 @@ export default function CheckoutPage({
 			console.log("Please enter valid name.");
 			return;
 		}
+
+		const order = {
+			guestName,
+			cart: cart.toUnfoldedArray(),
+		};
+		console.log("Order:", order);
 	};
 
 	return (
@@ -119,18 +125,8 @@ export default function CheckoutPage({
 				<TabbyLogo className="h-26 w-26" />
 			</div>
 			{/* back button */}
-			<Link
-				to={`../menu/${sessId}`}
-				className="flex w-1/2 cursor-pointer flex-row gap-6 transition-all duration-150 hover:scale-105"
-			>
-				<FullWidthLine />
-				<span className="w-fit font-medium text-nowrap">Back To</span>
-				<div className="rounded-full bg-accent p-1 text-primary">
-					<CaretDownIcon className="icon-sm rotate-180" />
-				</div>
-				<span className="font-medium">Menu</span>
-				<FullWidthLine />
-			</Link>
+			<BackBtn sessId={sessId} />
+
 			{/* body */}
 			<div
 				id="checkout-body"
@@ -197,6 +193,29 @@ export default function CheckoutPage({
 					Place Order
 				</button>
 			</div>
+		</motion.div>
+	);
+}
+
+function BackBtn({ sessId }: { sessId: string }) {
+	return (
+		<motion.div
+			animate={{ y: [0, -5, 0, -5, 0] }}
+			transition={{ repeat: Infinity, repeatDelay: 5 }}
+			className="flex w-full justify-center"
+		>
+			<Link
+				to={`../menu/${sessId}`}
+				className="flex w-1/2 cursor-pointer flex-row gap-6 transition-all duration-150 hover:scale-105"
+			>
+				<FullWidthLine />
+				<span className="w-fit font-medium text-nowrap">Back To</span>
+				<div className="rounded-full bg-accent p-1 text-primary">
+					<CaretDownIcon className="icon-sm rotate-180" />
+				</div>
+				<span className="font-medium">Menu</span>
+				<FullWidthLine />
+			</Link>
 		</motion.div>
 	);
 }

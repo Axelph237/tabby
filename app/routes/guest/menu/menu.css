@@ -29,10 +29,93 @@
 	position: relative;
 }
 
+.item-container {
+	--card-height: 200px;
+	--card-padding: 10px;
+	position: relative;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+}
 .item-body {
+	height: var(--card-height);
+	width: 100%;
+	padding: var(--card-padding);
+	background: var(--color-secondary);
 	border-radius: var(--corner-size) 0 var(--corner-size) var(--corner-size);
 }
+.item-price-tag-container {
+	--br: 6px; /* border radius */
+
+	position: absolute;
+	top: 5px;
+	left: 65%;
+	rotate: -10deg;
+	/* create stacking context for children */
+	z-index: 1;
+}
+.item-price-tag {
+	position: relative;
+	height: 40px;
+	width: fit-content;
+	border-radius: var(--br);
+	padding: 0 15px 0 0;
+	/* center text */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	/* green border */
+}
+.item-price-tag::before {
+	content: "";
+	position: absolute;
+	--r: var(--br);
+
+	height: 120%; /* approximation to align height to parent div */
+	aspect-ratio: cos(30deg);
+	left: -30.5px; /* approximation to align rounded corners to parent div */
+	/* triangle masking */
+	--_g: calc(tan(60deg) * var(--r)) right var(--r), #000 98%, #0000 101%;
+	mask:
+		conic-gradient(
+				from 240deg at calc(200% - 3 * var(--r) / 2),
+				#000 60deg,
+				#0000 0
+			)
+			100% 0 / calc(100% - 3 * var(--r) / 2) 100% no-repeat,
+		radial-gradient(var(--r) at calc(2 * var(--r)) 50%, #000 98%, #0000 101%),
+		radial-gradient(var(--r) at top var(--_g)),
+		radial-gradient(var(--r) at bottom var(--_g));
+	clip-path: polygon(0 50%, 100% 100%, 100% 0);
+	background: var(--color-primary);
+	/* position behind parent div */
+	z-index: -1;
+}
+.item-price-tag::after {
+	content: "";
+	position: absolute;
+	/* bleed around price tag */
+	--bleed: var(--card-padding);
+	right: calc(-1 * var(--bleed));
+	top: calc(-1 * var(--bleed));
+	border-radius: calc(var(--br) + var(--bleed));
+	height: calc(100% + 2 * var(--bleed));
+	width: calc(100% + 2 * var(--bleed));
+
+	background: var(--color-secondary);
+	/* position behind parent div AND tag corner */
+	z-index: -2;
+}
 .item-img-container {
+	position: relative;
+	height: calc(3 / 4 * var(--card-height));
+	width: 100%;
+	padding: var(--card-padding);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	background: var(--color-secondary);
 	border-radius: 0 var(--corner-size) var(--corner-size) 0;
 }
 .item-img-container::after {
@@ -49,6 +132,28 @@
 	content: "";
 	z-index: 1000;
 }
+.item-btn-container {
+	height: calc(1 / 4 * var(--card-height));
+	width: 100%;
+	display: flex;
+	align-items: start;
+	padding: calc(var(--card-padding) / 2);
+}
+.item-count-input {
+	background: var(--color-accent);
+}
+
+.item-options-container {
+	padding: 0 var(--border-radius-playful);
+}
+
+.item-options {
+	height: fit-content;
+	padding: var(--card-padding);
+	background: var(--color-secondary);
+	border-radius: 0 0 var(--border-radius-playful) var(--border-radius-playful);
+	opacity: 0.75;
+}
 
 /* Hide scrollbar but allow scrolling */
 .no-scroll {
@@ -64,11 +169,15 @@
 /* Style for the number input */
 input[type="number"] {
 	outline: none;
+	-moz-appearance: textfield;
+	appearance: textfied;
 }
 
 /* Customizing the number input buttons (WebKit browsers) */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
 	position: absolute;
 	opacity: 0;
 	visibility: hidden;

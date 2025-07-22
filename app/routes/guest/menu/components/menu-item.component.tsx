@@ -1,11 +1,21 @@
-import { motion, type MotionAdvancedProps } from "motion/react";
-import { type HTMLProps, useEffect, useState } from "react";
+import {
+	AnimatePresence,
+	motion,
+	type MotionAdvancedProps,
+} from "motion/react";
+import {
+	type HTMLProps,
+	useEffect,
+	useState,
+	type KeyboardEvent,
+	useRef,
+} from "react";
 import type { ItemWithOpts } from "~/routes/guest/menu/menu.validation";
-import type { CartItem } from "~/utils/cart";
 
 interface MenuItemProps extends MotionAdvancedProps {
 	item: ItemWithOpts & { count: number };
-	updateCart: (itemId: number, count: number) => void;
+	// Event caller for parent component that handles the cart itself changing
+	updateCart: (itemId: number, count: number, mode?: string) => void;
 }
 
 export default function MenuItem({
@@ -13,11 +23,13 @@ export default function MenuItem({
 	updateCart,
 	...props
 }: MenuItemProps) {
-	const [count, setCount] = useState(item.count);
-	const [clicked, setClicked] = useState(item.count > 0);
+	const [count, setCount] = useState<number>(item.count);
+	// const [clicked, setClicked] = useState(item.count > 0);
 
 	const [opened, setOpened] = useState(false);
 	const [options, setOptions] = useState(undefined);
+
+	const countInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (opened && !options) {
@@ -25,19 +37,80 @@ export default function MenuItem({
 		}
 	}, [opened]);
 
-	const addItem = (n: number = 1) => {
-		if (!clicked && count == 0) {
-			setClicked(true);
+	// All functions should only update count, allowing count to handle propogating events
+	useEffect(() => {
+		if (!opened && count > 0) {
 			setOpened(true);
-		} else if (n <= 0 && count <= 1) {
-			setClicked(false);
-			setOpened(false);
 		}
 
-		if (n <= 0 && count <= 0) return;
+		updateCart(item.id, count, "set");
+	}, [count]);
 
-		updateCart(item.id, n);
-		setCount(count + n);
+	// const addItem = (n: number = 1) => {
+	// 	if (!clicked && count == 0) {
+	// 		setClicked(true);
+	// 		// setOpened(true);
+	// 	} else if (n < 0 && count <= 1) {
+	// 		setClicked(false);
+	// 		// setOpened(false);
+	// 	}
+
+	// 	if (n <= 0 && count <= 0) return;
+
+	// 	updateCart(item.id, n);
+	// 	setCount(count + n);
+	// };
+
+	// ---- Count input handlers
+	const handleCountKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+		// Masks user input to ensure that only numbers are actually typed
+		if (
+			Number.isInteger(Number(event.key)) ||
+			event.key === "Backspace" ||
+			event.key === "Delete"
+		) {
+			return event;
+		} else {
+			event.preventDefault();
+			return false;
+		}
+	};
+
+	const handleCountInput = () => {
+		// Truncate leading zeros from input
+		const input = countInputRef.current!;
+		if (input.value.length > 1 && input.value[0] === "0") {
+			input.value = input.value.slice(1, input.value.length);
+		}
+
+		// Update count to input value
+		setCount(Number(countInputRef.current!.value));
+	};
+
+	// ---- Spinner button handlers
+	<AnimatePresence></AnimatePresence>;
+	// Increments the input like default spinners, but is used on buttons external to the input
+	const handleStepInput = (count: number) => {
+		const input = countInputRef.current;
+		if (!input) return;
+
+		const inputNum = Number(input.value);
+		if (Number.isInteger(inputNum)) {
+			// Update input value
+			const newVal = count + inputNum;
+			input.value = String(newVal < 0 ? 0 : newVal);
+			// Manually call count element input event
+			handleCountInput();
+		} else {
+			console.error(
+				"Numeric input field contains non-numeric values, or is not an integer.",
+			);
+		}
+	};
+
+	// ---- Add button handlers
+	const handleAddClicked = () => {
+		setCount(1);
 	};
 
 	return (
@@ -45,49 +118,96 @@ export default function MenuItem({
 			initial={{ opacity: 0, scale: 0 }}
 			animate={{ opacity: 1, scale: 1 }}
 			transition={{ delay: 0.15 }}
-			className="item-container relative flex h-[200px] w-full flex-row"
+			className="relative flex w-full flex-col"
 			{...props}
 		>
-			{/* LEFT COLUMN */}
-			<div className="flex h-full w-2/3 flex-col items-center justify-start">
-				{/* Info Body */}
-				<div
-					className={`item-body size-full bg-secondary p-[10px] transition-all duration-500`}
-				>
-					<h2 className="font-dongle text-3xl sm:text-4xl lg:text-5xl">
-						{item.name}
-					</h2>
-					<p className="text-md font-medium opacity-60 sm:text-lg lg:text-xl">
-						{item.description}
-					</p>
-				</div>
-			</div>
+			{/* Main Item Display */}
+			<div className="item-container">
+				{/* LEFT COLUMN */}
+				<div className="flex h-full w-2/3 flex-col items-center justify-start">
+					{/* Info Body */}
+					<AnimatePresence></AnimatePresence>
+					<div className={`item-body transition-all duration-500`}>
+						<div className="flex flex-row justify-between">
+							<h2 className="font-dongle text-3xl sm:text-4xl lg:text-5xl">
+								{item.name}
+							</h2>
+						</div>
 
-			{/* RIGHT COLUMN */}
-			<div className="flex h-full w-1/3 flex-col items-center justify-start">
-				{/* Img */}
-				<div
-					className={`item-img-container relative flex h-3/4 w-full items-center justify-center bg-secondary p-[10px] transition-all duration-500`}
-				>
-					{item.imgUrl && (
-						<img
-							className="item-img size-full rounded-xl object-cover"
-							src={item.imgUrl}
-							alt={item.name}
-						/>
-					)}
+						<div className="item-price-tag-container">
+							<div className="item-price-tag text-md bg-primary font-red-hat-mono font-medium text-accent">
+								${(item.basePrice / 100).toFixed(2)}
+							</div>
+						</div>
+
+						<p className="text-md font-medium opacity-60 sm:text-lg lg:text-xl">
+							{item.description}
+						</p>
+					</div>
+					{/* Item options */}
+					<div className="item-options-container h-fit w-full">
+						<AnimatePresence>
+							{opened && (
+								<motion.div
+									initial={{ height: "0" }}
+									animate={{ height: "100px" }}
+									className="item-options"
+								>
+									Hello
+								</motion.div>
+							)}
+						</AnimatePresence>
+					</div>
 				</div>
 
-				{/* Buttons */}
-				<div className="flex h-1/4 w-full items-start justify-center justify-evenly p-[5px] md:justify-center md:gap-[20px]">
-					{
-						<button
-							className="btn z-9999 size-full text-sm sm:text-lg"
-							onClick={() => addItem(1)}
-						>
-							Add
-						</button>
-					}
+				{/* RIGHT COLUMN */}
+				<div className="flex h-full w-1/3 flex-col items-center justify-start">
+					{/* Img */}
+					<div className={`item-img-container transition-all duration-500`}>
+						{item.imgUrl && (
+							<img
+								className="item-img size-full rounded-xl object-cover"
+								src={item.imgUrl}
+								alt={item.name}
+							/>
+						)}
+					</div>
+
+					{/* Buttons */}
+					<div className="item-btn-container justify-evenly md:justify-center md:gap-[20px]">
+						{opened ? (
+							<>
+								<button
+									onClick={() => handleStepInput(-1)}
+									className="btn z-9999 size-full text-sm sm:text-lg"
+								>
+									-
+								</button>
+								<input
+									ref={countInputRef}
+									type="number"
+									min="0"
+									onKeyDown={handleCountKeyDown}
+									onInput={handleCountInput}
+									defaultValue={count}
+									className="item-count-input z-9999 size-full rounded-xl text-center text-sm font-bold sm:text-lg"
+								/>
+								<button
+									onClick={() => handleStepInput(1)}
+									className="btn z-9999 size-full text-sm sm:text-lg"
+								>
+									+
+								</button>
+							</>
+						) : (
+							<button
+								className="btn z-9999 size-full text-sm sm:text-lg"
+								onClick={handleAddClicked}
+							>
+								Add
+							</button>
+						)}
+					</div>
 				</div>
 			</div>
 		</motion.div>
