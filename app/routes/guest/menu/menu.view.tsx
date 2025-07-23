@@ -207,7 +207,10 @@ export default function MenuPage({
 				)}
 			</Link>
 
-			<div className="relative flex h-full flex-col justify-end">
+			<div
+				id="menu-scroll-container"
+				className="relative flex h-full flex-col justify-end"
+			>
 				{/* Menu */}
 				<div
 					id="menu-container"

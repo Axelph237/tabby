@@ -1,5 +1,17 @@
-import { CaretDownIcon, TabbyLogo } from "~/lib/components/icons";
-import { type ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
+import {
+	CaretDownIcon,
+	PenIcon,
+	TabbyLogo,
+	TrashIcon,
+} from "~/lib/components/icons";
+import {
+	type ChangeEvent,
+	type ComponentProps,
+	Fragment,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import Cart from "../menu/cart";
 import { motion } from "motion/react";
 import FullWidthDottedLine from "~/lib/components/full-width-dotted-line";
@@ -21,6 +33,7 @@ export default function CheckoutPage({
 	const [name, setName] = useState("");
 	const [cart, setCart] = useState<Cart | undefined>(undefined);
 	const [menu, setMenu] = useState<Menu | undefined>(undefined);
+	const [editing, setEditing] = useState(false);
 	const [checkoutItems, setCheckoutItems] = useState<
 		(ItemWithOpts & { count: number })[] | undefined
 	>([]);
@@ -84,6 +97,14 @@ export default function CheckoutPage({
 	// 		.catch((err) => console.error(err));
 	// }, [menu]);
 
+	const handleDeleteClicked = (itemId: number) => {
+		if (checkoutItems === undefined || cart === undefined) return;
+
+		cart?.setItem(itemId, 0);
+		Cart.save(STORAGE_KEY, cart);
+		setCheckoutItems(checkoutItems?.filter((item) => item.id !== itemId));
+	};
+
 	const handleNameInput = (e: ChangeEvent<HTMLInputElement>) => {
 		const text = (inputRef.current! as HTMLInputElement).value;
 		setName(text);
@@ -132,8 +153,16 @@ export default function CheckoutPage({
 				id="checkout-body"
 				className="w-full font-red-hat-mono text-[20px]"
 			>
-				<p className="flex flex-row justify-between">
-					<span>QTY ITEM</span>
+				<p className="flex flex-row items-center justify-between">
+					<span className="flex w-full flex-row items-center gap-4">
+						QTY ITEM
+						<button
+							className="flex aspect-square cursor-pointer flex-row items-center justify-center rounded-xl bg-accent p-2 text-primary transition-all duration-150 hover:scale-105"
+							onClick={() => setEditing(!editing)}
+						>
+							<PenIcon className="icon-xs" />
+						</button>
+					</span>
 					<span>PRICE</span>
 				</p>
 
@@ -142,9 +171,18 @@ export default function CheckoutPage({
 				<ul className="flex flex-col gap-[10px] font-dongle text-[36px] text-primary">
 					{checkoutItems &&
 						checkoutItems.map((item, i) => (
-							<Fragment key={i}>
+							<li
+								className="flex h-[64px] flex-row gap-1"
+								key={i}
+							>
+								{editing && (
+									<DeleteButton
+										i={i}
+										onClick={() => handleDeleteClicked(item.id)}
+									/>
+								)}
 								<CheckoutItem item={item} />
-							</Fragment>
+							</li>
 						))}
 				</ul>
 
@@ -220,13 +258,45 @@ function BackBtn({ sessId }: { sessId: string }) {
 	);
 }
 
+function DeleteButton({ i, onClick }: { i: number; onClick: () => void }) {
+	const handleClick = () => {
+		console.log("Delete clicked");
+		onClick();
+	};
+
+	return (
+		<motion.button
+			onClick={handleClick}
+			transition={{ delay: Number(i) * 0.05 }}
+			initial={{
+				width: 0,
+				height: 0,
+				opacity: 0,
+				transform: "translate(50%, 50%)",
+				scale: 1,
+			}}
+			animate={{
+				width: "50px",
+				height: "50px",
+				opacity: 0.65,
+				transform: "translate(0,0)",
+				scale: 1,
+			}}
+			whileHover={{ opacity: 1, scale: 1.05 }}
+			className="m-2 flex aspect-square cursor-pointer items-center justify-center rounded-2xl bg-red-600 bg-linear-to-bl p-2 shadow-lg"
+		>
+			<TrashIcon className="icon-md" />
+		</motion.button>
+	);
+}
+
 function CheckoutItem({ item }: { item: ItemWithOpts & { count: number } }) {
 	return (
 		<motion.div
 			initial={{ opacity: 0, scale: 0, left: "-100%" }}
 			animate={{ opacity: 1, scale: 1, left: "0px" }}
 			transition={{ delay: 0.1 }}
-			className="layered relative h-[64px] w-full items-center justify-center overflow-hidden rounded-2xl bg-secondary"
+			className="layered relative size-full items-center justify-center overflow-hidden rounded-2xl bg-secondary"
 		>
 			{item.imgUrl && (
 				<img

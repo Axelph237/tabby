@@ -1,6 +1,9 @@
 import {
 	AnimatePresence,
 	motion,
+	useMotionValue,
+	useMotionValueEvent,
+	useScroll,
 	type MotionAdvancedProps,
 } from "motion/react";
 import {
@@ -8,6 +11,7 @@ import {
 	useEffect,
 	useState,
 	type KeyboardEvent,
+	type UIEvent,
 	useRef,
 } from "react";
 import type { ItemWithOpts } from "~/routes/guest/menu/menu.validation";
@@ -23,7 +27,7 @@ export default function MenuItem({
 	updateCart,
 	...props
 }: MenuItemProps) {
-	const [count, setCount] = useState<number>(item.count);
+	// const [count, setCount] = useState<number>(item.count);
 	// const [clicked, setClicked] = useState(item.count > 0);
 
 	const [opened, setOpened] = useState(false);
@@ -36,30 +40,6 @@ export default function MenuItem({
 			// On first open get option data for item.
 		}
 	}, [opened]);
-
-	// All functions should only update count, allowing count to handle propogating events
-	useEffect(() => {
-		if (!opened && count > 0) {
-			setOpened(true);
-		}
-
-		updateCart(item.id, count, "set");
-	}, [count]);
-
-	// const addItem = (n: number = 1) => {
-	// 	if (!clicked && count == 0) {
-	// 		setClicked(true);
-	// 		// setOpened(true);
-	// 	} else if (n < 0 && count <= 1) {
-	// 		setClicked(false);
-	// 		// setOpened(false);
-	// 	}
-
-	// 	if (n <= 0 && count <= 0) return;
-
-	// 	updateCart(item.id, n);
-	// 	setCount(count + n);
-	// };
 
 	// ---- Count input handlers
 	const handleCountKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -82,9 +62,6 @@ export default function MenuItem({
 		if (input.value.length > 1 && input.value[0] === "0") {
 			input.value = input.value.slice(1, input.value.length);
 		}
-
-		// Update count to input value
-		setCount(Number(countInputRef.current!.value));
 	};
 
 	// ---- Spinner button handlers
@@ -108,9 +85,18 @@ export default function MenuItem({
 		}
 	};
 
+	// ---- Customize button handlers
+	const handleCustomizeClicked = () => {
+		setOpened(true);
+	};
+
 	// ---- Add button handlers
 	const handleAddClicked = () => {
-		setCount(1);
+		const input = countInputRef.current;
+		if (!input) return;
+
+		updateCart(item.id, Number(input.value), "add");
+		setOpened(false);
 	};
 
 	return (
@@ -134,11 +120,7 @@ export default function MenuItem({
 							</h2>
 						</div>
 
-						<div className="item-price-tag-container">
-							<div className="item-price-tag text-md bg-primary font-red-hat-mono font-medium text-accent">
-								${(item.basePrice / 100).toFixed(2)}
-							</div>
-						</div>
+						<PriceTag value={(item.basePrice / 100).toFixed(2)} />
 
 						<p className="text-md font-medium opacity-60 sm:text-lg lg:text-xl">
 							{item.description}
@@ -174,41 +156,80 @@ export default function MenuItem({
 					</div>
 
 					{/* Buttons */}
-					<div className="item-btn-container justify-evenly md:justify-center md:gap-[20px]">
-						{opened ? (
-							<>
-								<button
-									onClick={() => handleStepInput(-1)}
-									className="btn z-9999 size-full text-sm sm:text-lg"
+					<div className="item-btn-container">
+						<AnimatePresence mode="wait">
+							{opened ? (
+								<>
+									<motion.div
+										key={`button-row-1-${item.id}`}
+										initial={{ top: "-100%", opacity: 0 }}
+										animate={{ top: 0, opacity: 1 }}
+										exit={{ top: "-100%", opacity: 0 }}
+										className="relative flex size-full flex-row justify-evenly md:justify-center md:gap-[20px]"
+									>
+										<button
+											onClick={() => handleStepInput(-1)}
+											className="item-btn z-9999 size-full rounded-xl text-sm sm:text-lg"
+										>
+											-
+										</button>
+										<input
+											ref={countInputRef}
+											type="number"
+											min="0"
+											onKeyDown={handleCountKeyDown}
+											onInput={handleCountInput}
+											defaultValue={"0"}
+											className="item-count-input z-9999 size-full rounded-xl text-center text-sm font-bold sm:text-lg"
+										/>
+										<button
+											onClick={() => handleStepInput(1)}
+											className="item-btn z-9999 size-full rounded-xl text-sm sm:text-lg"
+										>
+											+
+										</button>
+									</motion.div>
+									<motion.button
+										key={`button-row-2-${item.id}`}
+										initial={{ top: "-100%", opacity: 0 }}
+										animate={{ top: 0, opacity: 1 }}
+										exit={{ top: "-100%", opacity: 0 }}
+										className="item-btn relative z-9999 size-full w-full rounded-xl text-sm sm:text-lg"
+										onClick={handleAddClicked}
+									>
+										Add to
+									</motion.button>
+								</>
+							) : (
+								<motion.button
+									key={`button-customize-${item.id}`}
+									initial={{ scale: 0, opacity: 0 }}
+									animate={{ scale: 1, opacity: 1 }}
+									exit={{ scale: 0, opacity: 0 }}
+									className="item-btn item-btn relative z-9999 size-full rounded-xl text-sm sm:text-lg"
+									onClick={handleCustomizeClicked}
 								>
-									-
-								</button>
-								<input
-									ref={countInputRef}
-									type="number"
-									min="0"
-									onKeyDown={handleCountKeyDown}
-									onInput={handleCountInput}
-									defaultValue={count}
-									className="item-count-input z-9999 size-full rounded-xl text-center text-sm font-bold sm:text-lg"
-								/>
-								<button
-									onClick={() => handleStepInput(1)}
-									className="btn z-9999 size-full text-sm sm:text-lg"
-								>
-									+
-								</button>
-							</>
-						) : (
-							<button
-								className="btn z-9999 size-full text-sm sm:text-lg"
-								onClick={handleAddClicked}
-							>
-								Add
-							</button>
-						)}
+									Customize
+								</motion.button>
+							)}
+						</AnimatePresence>
 					</div>
 				</div>
+			</div>
+		</motion.div>
+	);
+}
+
+function PriceTag({ value }: { value: string }) {
+	return (
+		<motion.div
+			initial={{ rotate: 0 }}
+			whileInView={{ rotate: "-15deg" }}
+			transition={{ duration: 0.3, delay: 0.2, ease: "easeInOut" }}
+			className="item-price-tag-container"
+		>
+			<div className="item-price-tag text-md bg-primary font-red-hat-mono font-medium text-accent">
+				${value}
 			</div>
 		</motion.div>
 	);
