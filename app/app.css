@@ -9,6 +9,30 @@
 
 	--border-radius-formal: 8px;
 	--border-radius-playful: 16px;
+
+	--color-primary-r: 238;
+	--color-primary-g: 235;
+	--color-primary-b: 216;
+
+	--color-primary-dark-r: 205;
+	--color-primary-dark-g: 205;
+	--color-primary-dark-b: 168;
+
+	--color-secondary-r: 69;
+	--color-secondary-g: 115;
+	--color-secondary-b: 76;
+
+	--color-secondary-dark-r: 37;
+	--color-secondary-dark-g: 79;
+	--color-secondary-dark-b: 51;
+
+	--color-accent-r: 53;
+	--color-accent-g: 57;
+	--color-accent-b: 56;
+
+	--color-accent-dark-r: 42;
+	--color-accent-dark-g: 47;
+	--color-accent-dark-b: 46;
 }
 
 /* Tailwind design tokens */

@@ -13,13 +13,17 @@ import {
 	type KeyboardEvent,
 	type UIEvent,
 	useRef,
+	useLayoutEffect,
+	type Ref,
 } from "react";
-import type { ItemWithOpts } from "~/routes/guest/menu/menu.validation";
+import type { ItemWithOpts, Item } from "~/routes/guest/menu/menu.validation";
+import type { TLineItem } from "../useCartModel";
 
 interface MenuItemProps extends MotionAdvancedProps {
-	item: ItemWithOpts & { count: number };
+	item: ItemWithOpts;
+	count: number;
 	// Event caller for parent component that handles the cart itself changing
-	updateCart: (itemId: number, count: number, mode?: string) => void;
+	updateCart: (pi: Item, li: TLineItem) => void;
 }
 
 export default function MenuItem({
@@ -34,6 +38,7 @@ export default function MenuItem({
 	const [options, setOptions] = useState(undefined);
 
 	const countInputRef = useRef<HTMLInputElement>(null);
+	const notesInputRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (opened && !options) {
@@ -95,7 +100,22 @@ export default function MenuItem({
 		const input = countInputRef.current;
 		if (!input) return;
 
-		updateCart(item.id, Number(input.value), "add");
+		if (Number.isInteger(Number(input.value)) && Number(input.value) !== 0) {
+			// ... Get options if count is above 0
+			const newLineItem: TLineItem = {
+				count: Number(input.value),
+				selections: [],
+				notes: undefined,
+			};
+
+			updateCart(item as Item, newLineItem);
+
+			const commentsInput = document.getElementById(
+				`comments-input-${item.id}`,
+			);
+			console.log("Comments:", commentsInput?.innerText);
+		}
+
 		setOpened(false);
 	};
 
@@ -127,19 +147,10 @@ export default function MenuItem({
 						</p>
 					</div>
 					{/* Item options */}
-					<div className="item-options-container h-fit w-full">
-						<AnimatePresence>
-							{opened && (
-								<motion.div
-									initial={{ height: "0" }}
-									animate={{ height: "100px" }}
-									className="item-options"
-								>
-									Hello
-								</motion.div>
-							)}
-						</AnimatePresence>
-					</div>
+					<OptionContainer
+						opened={opened}
+						parentItemId={String(item.id)}
+					/>
 				</div>
 
 				{/* RIGHT COLUMN */}
@@ -233,4 +244,34 @@ function PriceTag({ value }: { value: string }) {
 			</div>
 		</motion.div>
 	);
+}
+
+function OptionContainer({
+	opened,
+	parentItemId,
+}: {
+	opened: boolean;
+	parentItemId: string;
+}) {
+	return (
+		<div
+			className={`item-options-container ${opened && "opened"} h-fit w-full`}
+		>
+			<div className={`item-options ${opened && "opened"}`}>
+				<label className="w-full sm:w-3/4">
+					<span className="font-bold">Comments</span>
+					<div
+						contentEditable
+						suppressContentEditableWarning
+						id={`comments-input-${parentItemId}`}
+						className="md:text-md min-h-[75px] w-full rounded-xl bg-primary p-2 font-red-hat-mono text-xs font-medium break-all text-accent outline-none sm:text-sm"
+					/>
+				</label>
+			</div>
+		</div>
+	);
+}
+
+function OptionInput() {
+	return <></>;
 }

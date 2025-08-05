@@ -57,7 +57,7 @@ export const itemTObj = t.Object({
 	id: t.Integer(),
 	name: t.String(),
 	description: t.Optional(Nullable(t.String())),
-	imgUrl: t.Optional(Nullable(t.String({ format: "uri" }))),
+	imgUrl: t.Optional(Nullable(t.String())),
 	basePrice: t.Integer(),
 	...timestamps,
 });

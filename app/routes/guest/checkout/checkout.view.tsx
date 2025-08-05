@@ -23,34 +23,30 @@ import {
 } from "../menu/menu.validation";
 import FullWidthLine from "~/lib/components/full-width-line";
 import { Link } from "react-router";
+import useCartModel, {
+	type TCartItem,
+	type TLineItem,
+} from "../menu/useCartModel";
 
 export default function CheckoutPage({
 	params: { sessId },
 }: {
 	params: { sessId: string };
 }) {
-	const STORAGE_KEY = `menu:${sessId}`;
+	// const STORAGE_KEY = `menu:${sessId}`;
 	const [name, setName] = useState("");
-	const [cart, setCart] = useState<Cart | undefined>(undefined);
-	const [menu, setMenu] = useState<Menu | undefined>(undefined);
+	// const [cart, setCart] = useState<Cart | undefined>(undefined);
+	// const [menu, setMenu] = useState<Menu | undefined>(undefined);
 	const [editing, setEditing] = useState(false);
-	const [checkoutItems, setCheckoutItems] = useState<
-		(ItemWithOpts & { count: number })[] | undefined
-	>([]);
+	const [menuItems, setMenuItems] = useState<Item[]>([]);
+	// const [checkoutItems, setCheckoutItems] = useState<
+	// 	(ItemWithOpts & { count: number })[] | undefined
+	// >([]);
+	const cartModel = useCartModel({ sessId });
 	const inputRef = useRef<HTMLInputElement>(null);
-
-	// Load cart on component mount
-	useEffect(() => {
-		// Get saved cart data
-		const savedCart = Cart.get(STORAGE_KEY);
-		// console.log("Cart:", savedCart);
-		setCart(savedCart);
-	}, []);
 
 	// Verify cart data to current menu on cart load
 	useEffect(() => {
-		if (!cart) return;
-
 		fetch(`/api/sessions/${sessId}`, {
 			method: "GET",
 			credentials: "include",
@@ -63,17 +59,21 @@ export default function CheckoutPage({
 				// console.log(sess);
 				const { items, ...menu } = sess.menu;
 
-				setMenu(menu);
+				setMenuItems(items);
 
-				const checkout: (ItemWithOpts & { count: number })[] = [];
-				for (const i of items) {
-					if (cart.getItems()[i.id])
-						checkout.push({ ...i, count: cart.getItems()[i.id] });
-				}
-				setCheckoutItems(checkout);
+				// const checkout: (ItemWithOpts & { count: number })[] = [];
+				// for (const i of items) {
+				// 	if (cartModel.items && cartModel.items[i.id])
+				// 		checkout.push({ ...i, count: cartModel.items[i.id].totalCount });
+				// }
+				// setCheckoutItems(checkout);
 			})
 			.catch((err) => console.log(err));
-	}, [cart]);
+	}, []);
+
+	useEffect(() => {
+		cartModel.validateEntries(menuItems);
+	}, [menuItems]);
 
 	// useEffect(() => {
 	// 	if (!menu || !cart) return;
@@ -97,12 +97,11 @@ export default function CheckoutPage({
 	// 		.catch((err) => console.error(err));
 	// }, [menu]);
 
-	const handleDeleteClicked = (itemId: number) => {
-		if (checkoutItems === undefined || cart === undefined) return;
+	// TODO Make checkout page care about line items, not standard items
+	const handleDeleteClicked = (itemId: number, lineItemId: string) => {
+		if (cartModel.items === undefined) return;
 
-		cart?.setItem(itemId, 0);
-		Cart.save(STORAGE_KEY, cart);
-		setCheckoutItems(checkoutItems?.filter((item) => item.id !== itemId));
+		cartModel.removeLineItem(itemId, lineItemId);
 	};
 
 	const handleNameInput = (e: ChangeEvent<HTMLInputElement>) => {
@@ -117,14 +116,15 @@ export default function CheckoutPage({
 	const handleSubmit = () => {
 		const guestName = (inputRef?.current as HTMLInputElement).value;
 
-		if (!cart || !guestName || guestName === "") {
+		if (!cartModel || !guestName || guestName === "") {
+			// This should be more descriptive if there is no cartModel
 			console.log("Please enter valid name.");
 			return;
 		}
 
 		const order = {
 			guestName,
-			cart: cart.toUnfoldedArray(),
+			cart: cartModel.toObject(),
 		};
 		console.log("Order:", order);
 	};
@@ -169,36 +169,41 @@ export default function CheckoutPage({
 				<FullWidthDottedLine />
 
 				<ul className="flex flex-col gap-[10px] font-dongle text-[36px] text-primary">
-					{checkoutItems &&
-						checkoutItems.map((item, i) => (
-							<li
-								className="flex h-[64px] flex-row gap-1"
-								key={i}
-							>
-								{editing && (
-									<DeleteButton
-										i={i}
-										onClick={() => handleDeleteClicked(item.id)}
+					{menuItems &&
+						menuItems.map((mi, i) => {
+							// Ensure at least one of these items is in the cart
+							if (!cartModel.items || !cartModel.items[mi.id]) return null;
+
+							// Get cart item data from menu item
+							const ci = cartModel.items[mi.id];
+							// Return an array of CheckoutItems for each "line item" under that "cart item"
+							// This is done this way so that the CheckoutItem can contain data from the "menu item" (visual and details data),
+							// and data from the "line item" (number purchased, selections, etc.)
+							return Object.entries(ci.lineItems).map(([liKey, li]) => (
+								<li
+									className="flex h-[64px] flex-row"
+									key={liKey}
+								>
+									{editing && (
+										<DeleteButton
+											i={0}
+											onClick={() => handleDeleteClicked(mi.id, liKey)}
+										/>
+									)}
+									<CheckoutItem
+										parentItem={mi}
+										lineItem={li}
 									/>
-								)}
-								<CheckoutItem item={item} />
-							</li>
-						))}
+								</li>
+							));
+						})}
 				</ul>
 
 				<FullWidthDottedLine />
 
 				<p className="flex flex-row justify-between">
 					<span>TOTAL</span>
-					<span>
-						$
-						{(
-							(checkoutItems?.reduce(
-								(a: number, curr) => a + curr.basePrice * curr.count,
-								0,
-							) ?? 0) / 100
-						).toFixed(2)}
-					</span>
+					<span>${cartModel.getCartPrice().toFixed(2)}</span>
 				</p>
 			</div>
 
@@ -274,6 +279,8 @@ function DeleteButton({ i, onClick }: { i: number; onClick: () => void }) {
 				opacity: 0,
 				transform: "translate(50%, 50%)",
 				scale: 1,
+				margin: 0,
+				padding: 0,
 			}}
 			animate={{
 				width: "50px",
@@ -281,16 +288,24 @@ function DeleteButton({ i, onClick }: { i: number; onClick: () => void }) {
 				opacity: 0.65,
 				transform: "translate(0,0)",
 				scale: 1,
+				margin: "10px",
+				padding: "4px",
 			}}
 			whileHover={{ opacity: 1, scale: 1.05 }}
-			className="m-2 flex aspect-square cursor-pointer items-center justify-center rounded-2xl bg-red-600 bg-linear-to-bl p-2 shadow-lg"
+			className="flex aspect-square cursor-pointer items-center justify-center rounded-2xl bg-red-600 bg-linear-to-bl shadow-lg"
 		>
 			<TrashIcon className="icon-md" />
 		</motion.button>
 	);
 }
 
-function CheckoutItem({ item }: { item: ItemWithOpts & { count: number } }) {
+function CheckoutItem({
+	parentItem,
+	lineItem,
+}: {
+	parentItem: Item;
+	lineItem: TLineItem;
+}) {
 	return (
 		<motion.div
 			initial={{ opacity: 0, scale: 0, left: "-100%" }}
@@ -298,18 +313,20 @@ function CheckoutItem({ item }: { item: ItemWithOpts & { count: number } }) {
 			transition={{ delay: 0.1 }}
 			className="layered relative size-full items-center justify-center overflow-hidden rounded-2xl bg-secondary"
 		>
-			{item.imgUrl && (
+			{parentItem.imgUrl && (
 				<img
-					src={item.imgUrl}
-					alt={item.name}
+					src={parentItem.imgUrl}
+					alt={parentItem.name}
 					className="top-0 left-0 aspect-auto w-[120%] object-cover opacity-[0.2] blur-lg"
 				/>
 			)}
 			<p className="mx-6 flex flex-row items-center justify-between">
 				<span>
-					{item.count} {item.name}
+					{lineItem.count} {parentItem.name}
 				</span>
-				<span>${((item.count * item.basePrice) / 100).toFixed(2)}</span>{" "}
+				<span>
+					${((lineItem.count * parentItem.basePrice) / 100).toFixed(2)}
+				</span>{" "}
 				{/* TODO fix base price when adding selections */}
 			</p>
 		</motion.div>

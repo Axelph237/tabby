@@ -7,21 +7,23 @@ import {
 	type Menu,
 	type ItemWithOpts,
 	type SessionDetails,
+	type Item,
 } from "~/routes/guest/menu/menu.validation";
 import MenuItem from "~/routes/guest/menu/components/menu-item.component";
 import { AnimatePresence, motion, useScroll } from "framer-motion";
 import Cart from "./cart";
+import useCartModel, { type TLineItem } from "./useCartModel";
 
 export default function MenuPage({
 	params: { sessId },
 }: {
 	params: { sessId: string };
 }) {
-	const STORAGE_KEY = `menu:${sessId}`;
 	const [menu, setMenu] = useState<Menu | undefined>(undefined);
 	const [items, setItems] = useState<ItemWithOpts[] | undefined>(undefined);
-	const [cart, setCart] = useState<Cart | undefined>(undefined);
-	const [numLineItems, setNumLineItems] = useState<number>(0);
+	// const [cart, setCart] = useState<Cart | undefined>(undefined);
+	// const [numLineItems, setNumLineItems] = useState<number>(0);
+	const cartModel = useCartModel({ sessId });
 
 	// Load menu data on component mount, optimistic loading for guests
 	useEffect(() => {
@@ -45,8 +47,8 @@ export default function MenuPage({
 				setMenu(menu);
 				setItems(items);
 
-				const savedCart = Cart.get(STORAGE_KEY);
-				setCart(savedCart);
+				// const savedCart = Cart.get(STORAGE_KEY);
+				// setCart(savedCart)
 			})
 			.catch((err) => console.warn(err));
 
@@ -99,24 +101,18 @@ export default function MenuPage({
 	// Validate cart when items have been loaded
 	// Ensures that items that have been removed from the menu are removed from the cart
 	useEffect(() => {
-		if (cart && items) {
-			// Validate cart entries
-			cart.validateEntries(items);
-			// Save cart to storage
-			Cart.save(STORAGE_KEY, cart);
-
-			setNumLineItems(cart.getNumItems());
+		if (items) {
+			cartModel.validateEntries(items);
 		}
-	}, [cart, items]);
+	}, [items]);
 
 	const createPebbleEffect = (dropIn: boolean) => {
-		console.log("Creating pebble effect");
-
 		const parent = document.getElementById("checkout-btn-container");
-		console.log("Checkout parent", parent);
+
 		if (parent) {
 			const parentRect = parent.getBoundingClientRect();
 			const pebble = document.createElement("div");
+
 			pebble.style.zIndex = "-1";
 			pebble.style.position = "absolute";
 			pebble.style.background = "var(--color-accent)";
@@ -141,31 +137,21 @@ export default function MenuPage({
 		}
 	};
 
-	const handleCartUpdate = (
-		itemId: number,
-		count: number,
-		mode: string = "add",
-	) => {
-		if (!cart || !items) return;
+	/**
+	 * Handles updates to the cart object. Including adding line items to the cart and executing animations.
+	 * @param pi - The parent of the line item being added.
+	 * @param li - The line item to add.
+	 * @returns
+	 */
+	const handleCartUpdate = (pi: Item, li: TLineItem) => {
+		if (!items || li.count <= 0) return;
 
-		if (mode === "add") {
-			cart.addItem(itemId, count);
-			// Visuals
-			createPebbleEffect(count > 0);
-		} else if (mode === "set") {
-			const prevCount = cart.getItems()[itemId];
+		console.log("Parent item", pi);
+		console.log("Line item:", li);
+		cartModel.createLineItem(pi, li);
 
-			cart.setItem(itemId, count);
-			// Visuals
-			if (cart.getNumItems()) {
-				createPebbleEffect(count > prevCount);
-			}
-		}
-
-		// Update storage data
-		Cart.save(STORAGE_KEY, cart);
-
-		setNumLineItems(cart.getNumItems());
+		// Visuals
+		createPebbleEffect(li.count > 0);
 	};
 
 	return (
@@ -189,10 +175,10 @@ export default function MenuPage({
 			<Link
 				to={`/guest/checkout/${sessId}`}
 				id="checkout-btn-container"
-				className={`${numLineItems < 1 && "pointer-events-none"} gooey fixed bottom-10 left-10 z-[9999] min-w-[100px] md:min-w-[200px]`}
+				className={`${cartModel.getNumLineItems() < 1 && "pointer-events-none"} gooey fixed bottom-10 left-10 z-[9999] min-w-[100px] md:min-w-[200px]`}
 				viewTransition
 			>
-				{numLineItems >= 1 && (
+				{cartModel.getNumLineItems() >= 1 && (
 					<motion.button
 						initial={{ scale: 0 }}
 						animate={{ scale: 1 }}
@@ -202,7 +188,7 @@ export default function MenuPage({
 					>
 						<ReceiptIcon className="icon-sm" />
 						<span className="hidden md:block">Checkout</span>
-						<span>({numLineItems})</span>
+						<span>({cartModel.getNumLineItems()})</span>
 					</motion.button>
 				)}
 			</Link>
@@ -240,7 +226,12 @@ export default function MenuPage({
 								items.map((item, i) => (
 									<Fragment key={i}>
 										<MenuItem
-											item={{ ...item, count: cart?.getItems()[item.id] ?? 0 }}
+											item={item}
+											count={
+												(cartModel.items &&
+													cartModel.items[item.id]?.totalCount) ??
+												0
+											}
 											updateCart={handleCartUpdate}
 										/>
 									</Fragment>
