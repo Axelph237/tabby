@@ -56,19 +56,10 @@ export default function useCartModel(
 	// Key used for saving and retrieving cart from session storage
 	const STORAGE_KEY = `cart:${init.sessId}`;
 
-	// Item groupings of line items and their details by their item id
-	const [itemGroups, setItemGroups] = useState<
-		Record<ItemId, { details: Item; lineItems: UUID[] }> | undefined
-	>(undefined);
-	// Line item details by their uuids, related to their parent items
-	const [lineItems, setLineItems] = useState<
-		Record<UUID, TLineItem> | undefined
-	>(undefined);
-
 	// Items stored in the cart
-	// const [items, setItems] = useState<Record<ItemId, TCartItem> | undefined>(
-	// 	init?.items,
-	// );
+	const [items, setItems] = useState<Record<ItemId, TCartItem> | undefined>(
+		init?.items,
+	);
 
 	// HOOKS
 	// Attempt to update cart once DOM has loaded
@@ -85,57 +76,44 @@ export default function useCartModel(
 
 			return () => clearTimeout(timeout);
 		}
-	}, [lineItems, parentItems]);
+	}, [items]);
 
 	// PRIVATE FUNCTIONS
 	/**
 	 * Sets a single item in the items state.
 	 * @param itemId - The id of the item to set.
-	 * @param setItem - A function whose only argument is the item object being update,
+	 * @param setItemFn - A function whose only argument is the item object being update,
 	 * and which returns the item object to set it to.
 	 */
 	const setItem = (
 		itemId: ItemId,
-		setItem:
-			| ((item: TCartItem | undefined) => Partial<TCartItem>)
-			| Partial<TCartItem>,
+		setItemFn: (item: TCartItem | undefined) => Partial<TCartItem>,
 	) => {
+		// Get previous item data from items
+		const prevItem = items && items[itemId];
+		// Call setter callback to get new item data
+		const newItem = setItemFn(prevItem);
+
+		// Merge previous and new item into ambiguous item
+		const mergedItem: TCartItem | Partial<TCartItem> = {
+			...prevItem,
+			...newItem,
+		};
+
+		// Ensure that the merged item is at least a valid item
+		// (all required fields have been set)
+		if (!Value.Check(CartItemObj, mergedItem)) {
+			throw new Error(
+				`Invalid TCartItem at itemId "${itemId}". Merged object does not satisfy schema.`,
+			);
+		}
+		// Explicitly cast and rename the variable
+		const fullItem = mergedItem as TCartItem;
+
 		return setItems({
 			...items,
-
-			// Set item to return of function
-			// Allows user to change parts of the item based on the item's values
-			// Returns only need to be partial, meaning an item can also be updated this way
-			[itemId]: {
-				...items[itemId],
-				...(typeof setItem === "function"
-					? setItem(items ? items[itemId] : undefined)
-					: setItem),
-			},
+			[itemId]: fullItem,
 		});
-	};
-
-	// Handles item category manipulation
-	const setLineItem = (
-		parentItem: Item,
-		liId: UUID,
-		setFunc: ((prev: TLineItem | undefined) => TLineItem) | TLineItem,
-	) => {
-		// Get previous line item from line items if defined
-		const prevLI = lineItems && lineItems[liId];
-
-		// Get previous line item group
-		let prevGroup = undefined;
-		if (prevLI && prevLI.parentItemId !== null && itemGroups)
-			prevGroup = itemGroups[prevLI.parentItemId];
-
-		// Get new line item from callback function or data
-		const newLI = typeof setFunc === "function" ? setFunc(prevLI) : setFunc;
-
-		// Get new line item group
-		let newGroup = undefined;
-		if (newLI.parentItemId !== null && itemGroups)
-			newGroup = itemGroups[newLI.parentItemId];
 	};
 
 	// EXPORTED FUNCTIONS
@@ -236,12 +214,12 @@ export default function useCartModel(
 			Object.entries(cartItem.lineItems).filter(([key]) => key !== lineItemId),
 		);
 
-		setItem(itemId, {
+		setItem(itemId, () => ({
 			totalCount: cartItem.totalCount - lineItem.count,
 			lineItems: {
 				...reducedLineItems,
 			},
-		});
+		}));
 	};
 
 	/**
